@@ -1,0 +1,10 @@
+Traffic01:ControlLoss
+Traffic02:FollowLeadingVehicle
+Traffic03:ObjectCrossing
+Traffic04:VehicleTurning
+Traffic05:LeadingVehicle
+Traffic06:ManeuverOppositeDirection
+Traffic07:OppositeVehicleRunningRedlight
+Traffic08:SignalizedJunctionLeftTurn
+Traffic09:SignalizedJunctionRightTurn
+Traffic10:NoSignalJunction
