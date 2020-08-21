@@ -20,3 +20,6 @@ To get started, you need to install the [CARLA simulator](https://carla.org/) as
 The [carla challenge](https://carlachallenge.org/) provides [10 of the most occuring pre-crash scenarios](https://carlachallenge.org/challenge/nhtsa/) as illustrations. As the scenario-runner documentation lacks a proper mapping of these scenarios to the example scenarios, a mapping can be found in the [scenarioMapping](scenarioMapping.txt) as a key-value-pairing.
 
 The values provided, are the filenames in which the configurations of these scenarios are in. As an example ``Traffic03:ObjectCrossing``, where ``ObjectCrossing`` is the filename in ``<scenario-runner-root>/srunner/examples`` and ``Traffic03`` is the scenario number coming from the carla challenge. Inside of the configuration file, you will find scenarios of type ``StationaryObjectCrossing`` and of type ``DynamicObjectCrossing``. Both are valid start scenarios to run with eg. ``python scenario_runner.py --scenario DynamicObjectCrossing_1 --reloadWorld --timeout 30`` (mind the ``_1`` after the scenarioname, as there are multiple ones).
+
+## Showing Spawnpoints and Waypoints of Intersections
+By running the python file **show_spawn_and_way_points.py** you can see all spawnpoints and all waypoits which belong to a certain junction. 
