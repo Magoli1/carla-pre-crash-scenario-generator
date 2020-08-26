@@ -1,27 +1,30 @@
-from xml.etree.ElementTree import Element, SubElement
+from xml.etree.ElementTree import Element
 
 
 class Scenario:
-    def __init__(self, carla_client):
+    def __init__(self, carla_client, config):
         self.client = carla_client
-        pass
+        if "type" not in config:
+            raise Exception("Scenario generator property 'type' is mandatory")
+        if "name_prefix" not in config:
+            config["name_prefix"] = config["type"]
+        self.config = config
 
     def get_available_towns(self):
         map_paths = self.client.get_available_maps()
         towns = []
         for map_path in map_paths:
-            towns.append(map_path.rsplit('/', 1)[-1])
+            towns.append(map_path.rsplit('/')[-1])
         return towns
 
-    def generate(self, tree, scenario_type, scenario_name_prefix=None):
-        if(scenario_name_prefix is None):
-            name_prefix = scenario_type
+    def generate(self, tree):
         root = tree.getroot()
         scenarios = []
         towns = self.get_available_towns()
         for idx, town in enumerate(towns):
             scenario = Element("scenario")
-            scenario.set("name", name_prefix + idx)
-            scenario.set("type", scenario_type)
+            scenario.set("name", f'{self.config["name_prefix"]}{idx}')
+            scenario.set("type", self.config["type"])
             scenario.set("town", town)
+            scenarios.append(scenario)
         root.extend(scenarios)
