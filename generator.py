@@ -1,27 +1,34 @@
-
-
 from core.xml.initializer import initialize_xml_tree
 from core.xml.file_writer import write_xml
 
-from core.plugin.loader import get_plugin_classes
+from core.plugin.loader import get_plugin_classes_in_configured_order
+from core.configuration.loader import get_config
 
-#import carla
+import carla
 import argparse
 
 
 def main():
-    classes = get_plugin_classes()
-    for Class in classes:
-        instance = Class("test")
-        instance.test()
-
+    generator_config = get_config()
     args = get_args()
     client = carla.Client(args.host, args.port)
     client.set_timeout(args.timeout)
 
     tree = initialize_xml_tree()
-
+    start_pipeline(client, generator_config, tree)
     write_xml(tree)
+
+
+def start_pipeline(carla_client, generator_config, tree):
+    classes = get_plugin_classes_in_configured_order(generator_config["pipeline"])
+    for idx, Class in enumerate(classes):
+        step_config = generator_config["pipeline"][idx]
+        if not isinstance(step_config, dict):
+            step_config = None
+        else:
+            step_config = list(step_config.values())[0]
+        instance = Class(carla_client, step_config)
+        instance.generate(tree)
 
 
 def get_args():
