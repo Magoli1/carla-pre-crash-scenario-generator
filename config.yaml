@@ -1,0 +1,5 @@
+pipeline:
+  - Scenario:
+      type: Test
+  - Weather:
+      mode: random
