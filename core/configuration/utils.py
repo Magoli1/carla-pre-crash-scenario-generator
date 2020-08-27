@@ -8,3 +8,10 @@ def get_pipeline_step_names(pipeline_config):
         else:
             raise Exception("Pipeline config not valid")
     return step_names
+
+
+def get_duplicates(sequence):
+    seen = set()
+    seen_add = seen.add
+    seen_twice = set(x for x in sequence if x in seen or seen_add(x))
+    return list(seen_twice)
