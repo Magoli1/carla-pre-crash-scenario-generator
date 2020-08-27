@@ -24,7 +24,7 @@ def start_pipeline(carla_client, generator_config, tree):
     for idx, Class in enumerate(classes):
         step_config = generator_config["pipeline"][idx]
         if not isinstance(step_config, dict):
-            step_config = None
+            step_config = dict()
         else:
             step_config = list(step_config.values())[0]
         instance = Class(carla_client, step_config)
