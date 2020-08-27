@@ -1,5 +1,6 @@
 pipeline:
   - Scenario:
-      type: Test
+      name: Test # optional, default <type>-idx
+      type: Test # mandatory
   - Weather:
-      mode: random
+      per_scenario: 5 # optional, default 1
