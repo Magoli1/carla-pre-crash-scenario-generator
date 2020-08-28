@@ -3,6 +3,7 @@ from core.xml.file_writer import write_xml
 
 from core.plugin.loader import get_plugin_classes_in_configured_order
 from core.configuration.loader import get_config
+from core.data.provider import DataProvider
 
 import carla
 import argparse
@@ -15,25 +16,33 @@ def main():
     client.set_timeout(args.timeout)
 
     tree = initialize_xml_tree()
-    start_pipeline(client, generator_config, tree)
+    data_provider = DataProvider(client)
+    start_pipeline(client, generator_config, tree, data_provider)
     write_xml(tree)
 
 
-def start_pipeline(carla_client, generator_config, tree):
+def start_pipeline(carla_client, generator_config, tree, data_provider):
     classes = get_plugin_classes_in_configured_order(generator_config["pipeline"])
+    if generator_config["dataprovider"]["preload"]:
+        print("Preloading data...")
+        data_provider.preload()
+        print("Preloading of data successful")
+    print("Generating data...")
     for idx, Class in enumerate(classes):
+        print(f'### Running pipeline step #{idx} {Class.__name__} ###')
         step_config = generator_config["pipeline"][idx]
         if not isinstance(step_config, dict):
             step_config = dict()
         else:
             step_config = list(step_config.values())[0]
-        instance = Class(carla_client, step_config)
+        instance = Class(carla_client, step_config, data_provider)
         instance.generate(tree)
+        print(f'### Done running pipeline step #{idx} {Class.__name__} ###')
+    print("Data generated")
 
 
 def get_args():
-    argparser = argparse.ArgumentParser(
-        description=__doc__)
+    argparser = argparse.ArgumentParser(description=__doc__)
     argparser.add_argument(
         '--host',
         metavar='H',
@@ -48,12 +57,13 @@ def get_args():
     argparser.add_argument(
         '-t', '--timeout',
         metavar='t',
-        default=5.0,
+        default=10.0,
         type=float,
-        help='Timeout of the carla client (default: 5.0)')
+        help='Timeout of the carla client (default: 10.0)')
     return argparser.parse_args()
 
 
 if __name__ == "__main__":
     print("#### Pre Crash Scenrio Generator ####")
     main()
+    print("#### Generating data done! *Happy Face* ####")
