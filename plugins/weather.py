@@ -1,34 +1,24 @@
 from xml.etree.ElementTree import SubElement
 import random
-import copy
+
+from core.helpers.utils import extend_scenarios
 
 
 class Weather:
-    def __init__(self, carla_client, config):
+    def __init__(self, carla_client, config, data_provider):
         self.client = carla_client
         if "per_scenario" not in config:
             config["per_scenario"] = 1
         if config["per_scenario"] <= 0:
             raise Exception("Weather generators optional property 'per_scenario' cannot be <= 0")
         self.config = config
+        self.data_provider = data_provider
 
     def generate(self, tree):
-        self.extend_scenarios(tree, self.config["per_scenario"] - 1)
+        extend_scenarios(tree, self.config["per_scenario"] - 1)
         for scenario in tree.getroot().getchildren():
             weather = SubElement(scenario, "weather")
             self.generate_random_weather_with_defaults(weather)
-
-    def extend_scenarios(self, tree, number_copies):
-        if number_copies <= 0:
-            return
-        root = tree.getroot()
-        children = root.getchildren()
-        for idx, scenario in enumerate(children):
-            for inner_idx in range(number_copies):
-                new_scenario = copy.deepcopy(scenario)
-                # TODO Naming could be enhanced
-                new_scenario.set("name", f'{new_scenario.get("name")}-{inner_idx}')
-                root.insert(idx + 1 + inner_idx + idx * number_copies, new_scenario)
 
     def generate_random_weather_with_defaults(self, weather_element):
         weather_element.set("cloudiness",
