@@ -8,5 +8,4 @@ def get_config(filename="config.yaml"):
         filename += ".yaml"
     with open(filename) as f:
         data = yaml.load(f, Loader=yaml.FullLoader)
-    check_valid_config(data)
-    return data
+    return check_valid_config(data)
