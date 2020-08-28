@@ -20,11 +20,13 @@ def write_xml(tree, filename=None, path="output/", ):
 
 
 def write_tree(tree, path, filename):
+    print("Writing XML file...")
     path_to_file = path + filename
     add_generator_comment(tree)
     pretty_xml = get_pretty_xml(tree)
     with open(path_to_file, "w") as f:
         f.write(pretty_xml)
+    print("Done writing XML file")
 
 
 def add_generator_comment(tree):
