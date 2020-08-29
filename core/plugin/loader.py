@@ -35,12 +35,12 @@ def get_plugin_classes_in_configured_order(pipeline_config):
     # gets the plugin classes in configured order
     classes = get_plugin_classes()
     class_names = get_module_class_names(classes)
-    class_in_order = []
+    classes_in_order = []
     pipeline_step_names = get_pipeline_step_names(pipeline_config)
     for class_name in pipeline_step_names:
         idx = class_names.index(class_name)
-        class_in_order.append(classes[idx])
-    return class_in_order
+        classes_in_order.append(classes[idx])
+    return classes_in_order
 
 
 def get_module_class_names(classes):
