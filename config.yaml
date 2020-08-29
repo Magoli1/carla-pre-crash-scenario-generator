@@ -1,20 +1,41 @@
 dataprovider: # optional, preload: False
-  preload: False
-pipeline:
-  - Scenario:
-      name: Test # optional, default <type>-idx
-      type: Test # mandatory
-  - Actor:
-      per_scenario: 1 # optional, default 1
-      tag: ego_vehicle # optional, default ego_vehicle
-      positioning: # optional, default junctions: True, streets: True
-        junctions: False
-        streets: True
-  - Actor:
-      per_scenario: 1 # optional, default 1
-      tag: other_actor # optional, default ego_vehicle
-      positioning: # optional, default junctions: True, streets: True
-        junctions: True
-        streets: False
-  - Weather:
-      per_scenario: 2 # optional, default 1
+  preload: True
+pipelines:
+  - Test: # name will be used as output filename and overwritten in case it exists
+      steps:
+        - Scenario:
+            name: Test # optional, default <type>-idx
+            type: Test # mandatory
+        - Actor:
+            per_scenario: 1 # optional, default 1
+            tag: ego_vehicle # optional, default ego_vehicle
+            positioning: # optional, default junctions: True, streets: True
+              junctions: False
+              streets: True
+        - Actor:
+            per_scenario: 1 # optional, default 1
+            tag: other_actor # optional, default ego_vehicle
+            positioning: # optional, default junctions: True, streets: True
+              junctions: True
+              streets: False
+        - Weather:
+            per_scenario: 2 # optional, default 1
+  - Test1: # name will be used as output filename and overwritten in case it exists
+      steps:
+        - Scenario:
+            name: Scenario # optional, default <type>-idx
+            type: HardType # mandatory
+        - Actor:
+            per_scenario: 1 # optional, default 1
+            tag: ego_vehicle # optional, default ego_vehicle
+            positioning: # optional, default junctions: True, streets: True
+              junctions: False
+              streets: True
+        - Actor:
+            per_scenario: 1 # optional, default 1
+            tag: other_actor # optional, default ego_vehicle
+            positioning: # optional, default junctions: True, streets: True
+              junctions: True
+              streets: False
+        - Weather:
+            per_scenario: 5 # optional, default 1
