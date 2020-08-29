@@ -4,6 +4,8 @@ import inspect
 
 import plugins
 from core.configuration.utils import get_pipeline_step_names
+from core.plugin.utils import get_module_class_names
+from core.plugin.validator import check_plugins
 
 
 def iter_namespace(ns_pkg):
@@ -28,6 +30,7 @@ def get_plugin_classes():
         for _, obj in inspect.getmembers(module):
             if inspect.isclass(obj) and obj.__module__.startswith("plugins."):
                 classes.append(obj)
+    check_plugins(classes)
     return classes
 
 
@@ -41,9 +44,3 @@ def get_plugin_classes_in_configured_order(pipeline_config):
         idx = class_names.index(class_name)
         classes_in_order.append(classes[idx])
     return classes_in_order
-
-
-def get_module_class_names(classes):
-    # get class name of classes
-    # eg. <class 'plugins.scenario.Scenario'> will give you Scenario
-    return [c.__name__ for c in classes]
