@@ -7,8 +7,14 @@ pipeline:
   - Actor:
       per_scenario: 1 # optional, default 1
       tag: ego_vehicle # optional, default ego_vehicle
-      positioning: # optional, default junctions: true, streets: true
-        junctions: true
-        streets: true
-  - Weather:
+      positioning: # optional, default junctions: True, streets: True
+        junctions: False
+        streets: True
+  - Actor:
       per_scenario: 1 # optional, default 1
+      tag: other_actor # optional, default ego_vehicle
+      positioning: # optional, default junctions: True, streets: True
+        junctions: True
+        streets: False
+  - Weather:
+      per_scenario: 2 # optional, default 1
