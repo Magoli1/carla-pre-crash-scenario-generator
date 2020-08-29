@@ -1,6 +1,6 @@
-def get_pipeline_step_names(pipeline_config):
+def get_pipeline_step_names(step_config):
     step_names = []
-    for step in pipeline_config:
+    for step in step_config:
         if isinstance(step, dict):
             step_names.append(list(step.keys())[0])
         elif isinstance(step, str):
@@ -9,9 +9,8 @@ def get_pipeline_step_names(pipeline_config):
             raise Exception("Pipeline config not valid")
     return step_names
 
+def extract_pipeline_name(pipeline):
+    return list(pipeline.keys())[0]
 
-def get_duplicates(sequence):
-    seen = set()
-    seen_add = seen.add
-    seen_twice = set(x for x in sequence if x in seen or seen_add(x))
-    return list(seen_twice)
+def extract_pipeline_config(pipeline):
+    return list(pipeline.values())[0]
