@@ -14,7 +14,7 @@ def get_waypoints_for_all_maps(carla_client, distance=5):
         waypoints = current_map.generate_waypoints(distance)
         waypoints_per_map[map_name] = dict()
         waypoints_per_map[map_name]["junctions"] = get_junction_waypoints(waypoints)
-        waypoints_per_map[map_name]["street"] = get_street_waypoints(waypoints)
+        waypoints_per_map[map_name]["streets"] = get_street_waypoints(waypoints)
     return waypoints_per_map
 
 
