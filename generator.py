@@ -3,6 +3,7 @@ from core.xml.file_writer import write_xml
 
 from core.plugin.loader import get_plugin_classes_in_configured_order
 from core.configuration.loader import get_config
+from core.configuration.utils import extract_pipeline_name, extract_pipeline_config
 from core.data.provider import DataProvider
 
 import carla
@@ -15,30 +16,35 @@ def main():
     client = carla.Client(args.host, args.port)
     client.set_timeout(args.timeout)
 
-    tree = initialize_xml_tree()
     data_provider = DataProvider(client)
-    start_pipeline(client, generator_config, tree, data_provider)
-    write_xml(tree)
+    start_pipeline(client, generator_config, data_provider)
 
 
-def start_pipeline(carla_client, generator_config, tree, data_provider):
-    classes = get_plugin_classes_in_configured_order(generator_config["pipeline"])
+def start_pipeline(carla_client, generator_config, data_provider):
+    pipelines = generator_config["pipelines"]
     if generator_config["dataprovider"]["preload"]:
-        print("Preloading data...")
+        print("### START preloading data START ###")
         data_provider.preload()
-        print("Preloading of data successful")
-    print("Generating data...")
-    for idx, Class in enumerate(classes):
-        print(f'### Running pipeline step #{idx} {Class.__name__} ###')
-        step_config = generator_config["pipeline"][idx]
-        if not isinstance(step_config, dict):
-            step_config = dict()
-        else:
-            step_config = list(step_config.values())[0]
-        instance = Class(carla_client, step_config, data_provider)
-        instance.generate(tree)
-        print(f'### Done running pipeline step #{idx} {Class.__name__} ###')
-    print("Data generated")
+        print("### END preloading data END ###")
+    print("### Running pipelines... ###")
+    for pipeline in pipelines:
+        pipeline_name = extract_pipeline_name(pipeline)
+        print(f'## START pipeline "{pipeline_name}" START ##')
+        tree = initialize_xml_tree()
+        pipeline_config = extract_pipeline_config(pipeline)
+        classes = get_plugin_classes_in_configured_order(pipeline_config["steps"])
+        for idx, Class in enumerate(classes):
+            print(f'# START pipeline step #{idx} {Class.__name__} START #')
+            step_config = pipeline_config["steps"][idx]
+            if not isinstance(step_config, dict):
+                step_config = dict()
+            else:
+                step_config = list(step_config.values())[0]
+            instance = Class(carla_client, step_config, data_provider)
+            instance.generate(tree)
+            print(f'# END pipeline step #{idx} {Class.__name__} END #')
+        write_xml(tree, filename=pipeline_name)
+        print(f'## END pipeline "{pipeline_name}" END ##')
 
 
 def get_args():
