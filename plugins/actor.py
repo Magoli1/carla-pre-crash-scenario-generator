@@ -49,5 +49,4 @@ class Actor:
         actor.set("y", str(round(waypoint.transform.location.y, 2)))
         actor.set("z", str(round(waypoint.transform.location.z, 2)))
         actor.set("yaw", str(round(waypoint.transform.rotation.yaw, 2)))
-        örint()
         pass
