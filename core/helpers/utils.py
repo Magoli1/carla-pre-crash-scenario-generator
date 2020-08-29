@@ -7,6 +7,13 @@ def is_full_qualified_map_name(name):
     return len(splitted_name) > 1
 
 
+def get_duplicates(sequence):
+    seen = set()
+    seen_add = seen.add
+    seen_twice = set(x for x in sequence if x in seen or seen_add(x))
+    return list(seen_twice)
+
+
 def get_simple_map_name(full_qualified_name):
     return full_qualified_name.rsplit('/')[-1]
 
@@ -31,9 +38,9 @@ def change_map(carla_client, map_name, number_tries=10, timeout=2):
         try:
             carla_client.get_world().get_map()
         except:
-            print(f'Attempt #{idx+1} to get new map...')
+            print(f'Attempt #{idx + 1} to get new map...')
         else:
-            print(f'New map loaded at attempt #{idx+1}')
+            print(f'New map loaded at attempt #{idx + 1}')
             break
         if idx == (number_tries - 1):
             raise Exception(
