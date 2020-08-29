@@ -18,9 +18,9 @@ class Weather:
         extend_scenarios(tree, self.config["per_scenario"] - 1)
         for scenario in tree.getroot().getchildren():
             weather = SubElement(scenario, "weather")
-            self.generate_random_weather_with_defaults(weather)
+            self.decorate_weather_random_with_defaults(weather)
 
-    def generate_random_weather_with_defaults(self, weather_element):
+    def decorate_weather_random_with_defaults(self, weather_element):
         weather_element.set("cloudiness",
                             str(self.config.get("cloudiness", round(random.uniform(0, 100), 2))))
         weather_element.set("precipitation",
