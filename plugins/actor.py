@@ -9,7 +9,7 @@ class Actor:
     def __init__(self, carla_client, config, data_provider, step_idx):
         self.client = carla_client
         if "type" not in config:
-            raise Exception("Actor generators required property 'type' is missing")
+            config["type"] = "vehicle"
         if config["type"] == "vehicle":
             self.vehicle_models = [vehicle.id for vehicle in
                                    self.client.get_world().get_blueprint_library().filter(
