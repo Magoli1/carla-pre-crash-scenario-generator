@@ -6,7 +6,7 @@ import random
 
 
 class Actor:
-    def __init__(self, carla_client, config, data_provider):
+    def __init__(self, carla_client, config, data_provider, step_idx):
         self.client = carla_client
         if "type" not in config:
             raise Exception("Actor generators required property 'type' is missing")
@@ -35,9 +35,10 @@ class Actor:
                 "Actor generators optional properties 'streets' and 'junctions' cannot both be 'False'")
         self.config = config
         self.data_provider = data_provider
+        self.step_idx = step_idx
 
     def generate(self, tree):
-        extend_scenarios(tree, self.config["per_scenario"] - 1)
+        extend_scenarios(tree, self.config["per_scenario"] - 1, self.step_idx)
         for scenario in tree.getroot().getchildren():
             actor = SubElement(scenario, self.config["tag"])
             attributes = {}
