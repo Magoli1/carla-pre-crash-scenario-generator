@@ -16,7 +16,7 @@ pipelines:
         - Actor:
             per_scenario: 1 # optional, default 1
             tag: other_actor # optional, default ego_vehicle
-            type: vehicle # optional, default vehicle
+            type: walker # optional, default vehicle
             positioning: # optional, default junctions: True, streets: True
               junctions: True
               streets: False

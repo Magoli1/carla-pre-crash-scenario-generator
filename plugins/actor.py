@@ -10,10 +10,9 @@ class Actor:
         self.client = carla_client
         if "type" not in config:
             config["type"] = "vehicle"
-        if config["type"] == "vehicle":
-            self.vehicle_models = [vehicle.id for vehicle in
-                                   self.client.get_world().get_blueprint_library().filter(
-                                       'vehicle')]
+        self.actor_models = [actor.id for actor in
+                               self.client.get_world().get_blueprint_library().filter(
+                                   config["type"])]
         if "tag" not in config:
             if config["type"] == "vehicle":
                 config["tag"] = "ego_vehicle"
@@ -44,8 +43,7 @@ class Actor:
             attributes = {}
             attributes["waypoint"] = random.choice(
                 self.get_allowed_waypoints_in_town(scenario.get("town")))
-            if self.config["type"] == "vehicle":
-                attributes["vehicle_model"] = random.choice(self.vehicle_models)
+            attributes["actor_model"] = random.choice(self.actor_models)
             self.decorate_actor(actor, **attributes)
 
     def get_allowed_waypoints_in_town(self, town_name):
@@ -65,6 +63,6 @@ class Actor:
             actor.set("z", str(round(kwargs["waypoint"].transform.location.z, 2)))
             actor.set("yaw", str(round(kwargs["waypoint"].transform.rotation.yaw, 2)))
 
-        if "vehicle_model" in kwargs:
-            actor.set("model", kwargs["vehicle_model"])
+        if "actor_model" in kwargs:
+            actor.set("model", kwargs["actor_model"])
         pass
