@@ -8,8 +8,17 @@ import random
 class Actor:
     def __init__(self, carla_client, config, data_provider):
         self.client = carla_client
+        if "type" not in config:
+            raise Exception("Actor generators required property 'type' is missing")
+        if config["type"] == "vehicle":
+            self.vehicle_models = [vehicle.id for vehicle in
+                                   self.client.get_world().get_blueprint_library().filter(
+                                       'vehicle')]
         if "tag" not in config:
-            config["tag"] = "ego_vehicle"
+            if config["type"] == "vehicle":
+                config["tag"] = "ego_vehicle"
+            else:
+                config["tag"] = "other_actor"
         if "per_scenario" not in config:
             config["per_scenario"] = 1
         if config["per_scenario"] <= 0:
@@ -31,8 +40,12 @@ class Actor:
         extend_scenarios(tree, self.config["per_scenario"] - 1)
         for scenario in tree.getroot().getchildren():
             actor = SubElement(scenario, self.config["tag"])
-            waypoint = random.choice(self.get_allowed_waypoints_in_town(scenario.get("town")))
-            self.decorate_actor(actor, waypoint)
+            attributes = {}
+            attributes["waypoint"] = random.choice(
+                self.get_allowed_waypoints_in_town(scenario.get("town")))
+            if self.config["type"] == "vehicle":
+                attributes["vehicle_model"] = random.choice(self.vehicle_models)
+            self.decorate_actor(actor, **attributes)
 
     def get_allowed_waypoints_in_town(self, town_name):
         pos_config = self.config["positioning"]
@@ -44,9 +57,13 @@ class Actor:
             allowed_waypoints += waypoints_in_town["streets"]
         return allowed_waypoints
 
-    def decorate_actor(self, actor, waypoint):
-        actor.set("x", str(round(waypoint.transform.location.x, 2)))
-        actor.set("y", str(round(waypoint.transform.location.y, 2)))
-        actor.set("z", str(round(waypoint.transform.location.z, 2)))
-        actor.set("yaw", str(round(waypoint.transform.rotation.yaw, 2)))
+    def decorate_actor(self, actor, **kwargs):
+        if "waypoint" in kwargs:
+            actor.set("x", str(round(kwargs["waypoint"].transform.location.x, 2)))
+            actor.set("y", str(round(kwargs["waypoint"].transform.location.y, 2)))
+            actor.set("z", str(round(kwargs["waypoint"].transform.location.z, 2)))
+            actor.set("yaw", str(round(kwargs["waypoint"].transform.rotation.yaw, 2)))
+
+        if "vehicle_model" in kwargs:
+            actor.set("model", kwargs["vehicle_model"])
         pass

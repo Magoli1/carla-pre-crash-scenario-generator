@@ -34,7 +34,7 @@ def change_map(carla_client, map_name, number_tries=10, timeout=2):
     except:
         pass
     for idx in range(number_tries):
-        # this fails if its currently changeing as it cant connect in before timeout
+        # this fails if its currently changing as it cant connect in before timeout
         try:
             carla_client.get_world().get_map()
         except:
