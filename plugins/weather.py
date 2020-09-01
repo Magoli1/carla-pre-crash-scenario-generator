@@ -7,7 +7,7 @@ from core.helpers.utils import extend_scenarios
 
 
 class Weather:
-    def __init__(self, carla_client, config, data_provider):
+    def __init__(self, carla_client, config, data_provider, step_idx):
         self.client = carla_client
         if "per_scenario" not in config:
             config["per_scenario"] = 1
@@ -19,6 +19,7 @@ class Weather:
             raise Exception("Weather genernation_type must be either 'random_preset' or 'random'")
         self.config = config
         self.data_provider = data_provider
+        self.step_idx = step_idx
         self.carla_weather_presets = ["ClearNoon", "CloudyNoon", "WetNoon", "WetCloudyNoon",
                                       "SoftRainNoon", "MidRainyNoon", "HardRainNoon",
                                       "ClearSunset", "CloudySunset", "WetSunset",
@@ -26,7 +27,7 @@ class Weather:
                                       "HardRainSunset"]
 
     def generate(self, tree):
-        extend_scenarios(tree, self.config["per_scenario"] - 1)
+        extend_scenarios(tree, self.config["per_scenario"] - 1, self.step_idx)
         for scenario in tree.getroot().getchildren():
             weather = SubElement(scenario, "weather")
             self.decorate_weather_random_with_defaults(weather)

@@ -34,7 +34,7 @@ def change_map(carla_client, map_name, number_tries=10, timeout=2):
     except:
         pass
     for idx in range(number_tries):
-        # this fails if its currently changeing as it cant connect in before timeout
+        # this fails if its currently changing as it cant connect in before timeout
         try:
             carla_client.get_world().get_map()
         except:
@@ -48,7 +48,7 @@ def change_map(carla_client, map_name, number_tries=10, timeout=2):
         time.sleep(timeout)
 
 
-def extend_scenarios(tree, number_copies):
+def extend_scenarios(tree, number_copies, step_idx):
     if number_copies <= 0:
         return
     root = tree.getroot()
@@ -57,5 +57,5 @@ def extend_scenarios(tree, number_copies):
         for inner_idx in range(number_copies):
             new_scenario = copy.deepcopy(scenario)
             # TODO Naming could be enhanced
-            new_scenario.set("name", f'{new_scenario.get("name")}-{inner_idx}')
+            new_scenario.set("name", f'{new_scenario.get("name")}-{step_idx}-{inner_idx}')
             root.insert(idx + 1 + inner_idx + idx * number_copies, new_scenario)
