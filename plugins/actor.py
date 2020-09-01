@@ -14,10 +14,7 @@ class Actor:
                                self.client.get_world().get_blueprint_library().filter(
                                    config["type"])]
         if "tag" not in config:
-            if config["type"] == "vehicle":
-                config["tag"] = "ego_vehicle"
-            else:
-                config["tag"] = "other_actor"
+            config["tag"] = "ego_vehicle"
         if "per_scenario" not in config:
             config["per_scenario"] = 1
         if config["per_scenario"] <= 0:
