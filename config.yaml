@@ -21,6 +21,7 @@ pipelines:
               junctions: True
               streets: False
         - Weather:
+            generation_type: random_preset # chose from {random, random_preset} default: random_preset
             per_scenario: 2 # optional, default 1
   - Test1: # name will be used as output filename and overwritten in case it exists
       steps:
@@ -42,4 +43,5 @@ pipelines:
               junctions: True
               streets: False
         - Weather:
+            generation_type: random_preset # chose from {random, random_preset} default: random_preset
             per_scenario: 5 # optional, default 1
