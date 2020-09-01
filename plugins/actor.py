@@ -11,10 +11,13 @@ class Actor:
         if "type" not in config:
             config["type"] = "vehicle"
         self.actor_models = [actor.id for actor in
-                               self.client.get_world().get_blueprint_library().filter(
-                                   config["type"])]
+                             self.client.get_world().get_blueprint_library().filter(
+                                 config["type"])]
         if "tag" not in config:
             config["tag"] = "ego_vehicle"
+        if config["tag"] not in ["ego_vehicle", "other_actor"]:
+            raise Exception(
+                "Actor generators optional property 'tag' must be in ['ego_vehicle', 'other_actor']")
         if "per_scenario" not in config:
             config["per_scenario"] = 1
         if config["per_scenario"] <= 0:
