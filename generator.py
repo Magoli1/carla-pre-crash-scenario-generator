@@ -40,7 +40,7 @@ def start_pipeline(carla_client, generator_config, data_provider):
                 step_config = dict()
             else:
                 step_config = list(step_config.values())[0]
-            instance = Class(carla_client, step_config, data_provider)
+            instance = Class(carla_client, step_config, data_provider, idx)
             instance.generate(tree)
             print(f'# END pipeline step #{idx} {Class.__name__} END #')
         write_xml(tree, filename=pipeline_name)
