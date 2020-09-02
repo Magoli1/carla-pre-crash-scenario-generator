@@ -1,5 +1,5 @@
-import time
 import copy
+import time
 
 
 def is_full_qualified_map_name(name):
@@ -22,8 +22,10 @@ def get_junction_waypoints(waypoints):
     return [waypoint for waypoint in waypoints if waypoint.is_junction]
 
 
-def get_street_waypoints(waypoints):
-    return [waypoint for waypoint in waypoints if not waypoint.is_junction]
+def get_street_waypoints(waypoints, min_dist_before_junction=50):
+    return [waypoint for waypoint in waypoints if
+            not waypoint.is_junction and
+            len(waypoint.next_until_lane_end(1)) > min_dist_before_junction]
 
 
 def change_map(carla_client, map_name, number_tries=10, timeout=2):
