@@ -41,13 +41,14 @@ pipelines:
 #### Plugins
 You are able to define the pipeline steps via the extensible plugin system (more on this [here](#write-your-own-plugin)). To provide basic functionality we provide three different plugins for direct usage. You are also free to extend those depending on your needs. It is also possible to specify multiple plugins of the same type after each other, eg. if you would like to have multiple *actors*.
 ##### Scenario
-The scenario plugin creates the ``scenario`` tag with the attributes ``name`` and ``type``, as well as the ``town``. As a mandatory configuration entry, you need to add the *type*. The *name_prefix* will be defaulted to ``type<idx>``, where *idx* is the index of the generated scenario, but you can also provide your own. The plugin will use all to carla available maps and it generates one entry per map.
+The Scenario plugin creates the ``scenario`` tag with the attributes ``name`` and ``type``, as well as the ``town``. As a mandatory configuration entry, you need to add the *type*. The *name_prefix* will be defaulted to ``type<idx>``, where *idx* is the index of the generated scenario, but you can also provide your own. The plugin will use all to carla available maps and it generates one entry per map.
 ```
 - Scenario:
     name_prefix: Test
     type: ControlLoss
 ```
 ##### Actor
+The Actor plugin can be used for any kind of actor like vehicles or walkers. In the default case, the actor plugin is configured to generate *ego_vehicle* tags with vehicles from the blueprint library. When supplying the ``per_scenario`` attribute, you can multiply the aready created scenarios from the former pipeline steps. It is also possible to supply the ``tag`` name that the plugin writes into the xml, eg. if you would like to use ``other_actor`` as a tag. You can also change the type of actor, that is used for the *model* attribute, by changing the ``type``. To position the actors, you can configure the ``positioning`` for *junctions* and/or *streets*.
 ```
 - Actor:
     per_scenario: 5 # optional, default 1
