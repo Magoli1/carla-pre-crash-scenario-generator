@@ -47,11 +47,14 @@ pipelines:
 You are able to define the pipeline steps via the extensible plugin system (more on this [here](#write-your-own-plugin)). To provide basic functionality we provide three different plugins for direct usage. You are also free to extend those depending on your needs. It is also possible to specify multiple plugins of the same type after each other, eg. if you would like to have multiple *actors*.
 
 ##### Scenario
-The Scenario plugin creates the ``scenario`` tag with the attributes ``name`` and ``type``, as well as the ``town``. As a mandatory configuration entry, you need to add the *type*. The *name_prefix* will be defaulted to ``type<idx>``, where *idx* is the index of the generated scenario, but you can also provide your own. The plugin will use all to carla available maps and it generates one entry per map.
+The Scenario plugin creates the ``scenario`` tag with the attributes ``name`` and ``type``, as well as the ``town``. As a mandatory configuration entry, you need to add the *type*. The *name_prefix* will be defaulted to ``type<idx>``, where *idx* is the index of the generated scenario, but you can also provide your own. The plugin will use all to carla available maps and it generates one entry per map. You can optionally specify the ``map_blacklist`` to exclude specific maps with their *simple name*.
 ```yaml
 - Scenario:
     name_prefix: Test
     type: ControlLoss
+    map_blacklist:
+      - Town01
+      - Town02
 ```
 
 ##### Actor
