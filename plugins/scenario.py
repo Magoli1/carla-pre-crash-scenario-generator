@@ -9,16 +9,16 @@ class Scenario:
             raise Exception("Scenario generator property 'type' is mandatory")
         if "name_prefix" not in config:
             config["name_prefix"] = config["type"]
-        if "map_blacklist" in config and not isinstance(config["map_blacklist"], list):
-            raise Exception("Scenario generator property 'map_blacklist' needs to be a list")
-        if "map_blacklist" in config and not config["map_blacklist"]:
-            raise Exception("Scenario generator property 'map_blacklist' is not allowed to be empty")
         all_maps = data_provider.get_available_maps_simple_name()
         if "map_blacklist" in config:
+            if not isinstance(config["map_blacklist"], list):
+                raise Exception("Scenario generator property 'map_blacklist' needs to be a list")
+            if not config["map_blacklist"]:
+                raise Exception("Scenario generator property 'map_blacklist' is not allowed to be empty")
             is_subset = set(config["map_blacklist"]).issubset(all_maps)
             if not is_subset:
                 raise Exception(f'Scenario generator property "map_blacklist" has one value which is not in {all_maps}')
-        if "map_blacklist" not in config:
+        else:
             config["map_blacklist"] = []
         self.maps = [carla_map for carla_map in all_maps if carla_map not in config["map_blacklist"]]
         self.config = config
