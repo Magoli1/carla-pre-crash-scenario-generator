@@ -18,8 +18,8 @@ pipelines:
             generation_type: random_preset # chose from {random, random_preset} default: random_preset
             per_scenario: 5 # optional, default 1
 
-  # 2 Scenario FollowLeadingVehicle
-  - 2_FollowLeadingVehicle_generated:
+  # 2.1 Scenario FollowLeadingVehicle
+  - 2_1_FollowLeadingVehicle_generated:
       steps:
         - Scenario:
             name_prefix: FollowLeadingVehicle_generated
@@ -30,6 +30,22 @@ pipelines:
             positioning:
                 junctions: False
                 streets: True
+        - Weather:
+            generation_type: random_preset
+            per_scenario: 5
+
+  # 2.2 Scenario FollowLeadingVehicleWithObstacle
+  - 2_2_FollowLeadingVehicleWithObstacle_generated:
+      steps:
+        - Scenario:
+            name_prefix: FollowLeadingVehicleWithObstacle_generated
+            type: FollowLeadingVehicleWithObstacle
+        - Actor:
+            per_scenario: 5
+            tag: ego_vehicle
+            positioning:
+              junctions: False
+              streets: True
         - Weather:
             generation_type: random_preset
             per_scenario: 5
