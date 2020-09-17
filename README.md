@@ -12,6 +12,7 @@
 * [Scenarios](#scenarios)
 * [Tools](#tools)
     * [Showing Spawnpoints and Waypoints of Intersections](#showing-spawnpoints-and-waypoints-of-intersections)
+* [Generate the code documentation](#generate-the-code-documentation)
 * [Useful Links](#useful-links)
 
 ## Getting Started
@@ -130,6 +131,14 @@ We provide several powerful tools, that are helpful in order to develop new feat
 
 ### Showing Spawnpoints and Waypoints of Intersections
 By running the python file **show_spawn_and_way_points.py** you can see all spawnpoints and all waypoits which belong to a certain junction. 
+
+## Generate the code documentation
+The projects code documentation is written in docstring and is making use of [Sphinx](https://www.sphinx-doc.org/en/master/index.html). Before generating the documentation, make sure you have installed all requirements. Then run the following commands:
+```shell script
+cd docs
+make markdown && make html
+sphinx-build -M markdown ./ build
+```
 
 ## Useful Links
 + [CARLA Driving Challenge](https://carlachallenge.org/challenge/nhtsa/)
