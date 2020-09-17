@@ -136,8 +136,7 @@ By running the python file **show_spawn_and_way_points.py** you can see all spaw
 The projects code documentation is written in docstring and is making use of [Sphinx](https://www.sphinx-doc.org/en/master/index.html). Before generating the documentation, make sure you have installed all requirements. Then run the following commands:
 ```shell script
 cd docs
-make markdown && make html
-sphinx-build -M markdown ./ build
+make html
 ```
 
 ## Useful Links
