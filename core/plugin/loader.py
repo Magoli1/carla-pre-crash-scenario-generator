@@ -25,6 +25,11 @@ discovered_plugins = {
 
 
 def get_plugin_classes():
+    """Returns all classes contained in the plugin directory
+
+    :returns: All classes which are declared in the files in the plugin directory
+    :rtype: list
+    """
     classes = []
     for _, module in discovered_plugins.items():
         for _, obj in inspect.getmembers(module):
@@ -35,7 +40,13 @@ def get_plugin_classes():
 
 
 def get_plugin_classes_in_configured_order(pipeline_config):
-    # gets the plugin classes in configured order
+    """Returns all classes in the plugin directory in configured order
+
+    :param pipeline_config: Pipelines configuration entity
+    :type pipeline_config: dict
+    :returns: All classes which are declared in the files in the plugin directory in the configured order of the generator config
+    :rtype: list
+    """
     classes = get_plugin_classes()
     class_names = get_module_class_names(classes)
     classes_in_order = []

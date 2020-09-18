@@ -1,4 +1,11 @@
 def get_pipeline_step_names(step_config):
+    """Extracts the step names from the configured steps of a pipeline
+
+    :param step_config: Step configuration of a pipeline
+    :type step_config: dict
+    :returns: The names of the steps
+    :rtype: list
+    """
     step_names = []
     for step in step_config:
         if isinstance(step, dict):
@@ -10,7 +17,21 @@ def get_pipeline_step_names(step_config):
     return step_names
 
 def extract_pipeline_name(pipeline):
+    """Extracts the name of a configured pipeline
+
+    :param pipeline: Pipeline configuration entity
+    :type pipeline: dict
+    :returns: The name of the given pipeline
+    :rtype: str
+    """
     return list(pipeline.keys())[0]
 
 def extract_pipeline_config(pipeline):
+    """Extracts the configuration entities of a pipeline
+
+    :param pipeline: Pipeline configuration entity
+    :type pipeline: dict
+    :returns: The configuration entities of pipeline
+    :rtype: dict
+    """
     return list(pipeline.values())[0]

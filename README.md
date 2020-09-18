@@ -12,6 +12,7 @@
 * [Scenarios](#scenarios)
 * [Tools](#tools)
     * [Showing Spawnpoints and Waypoints of Intersections](#showing-spawnpoints-and-waypoints-of-intersections)
+* [Generate the code documentation](#generate-the-code-documentation)
 * [Useful Links](#useful-links)
 
 ## Getting Started
@@ -117,7 +118,7 @@ As described [here](#dataprovider), the data provider gives you a powerful metho
 To make regular tasks easy, we provide the following helper methods that can be imported inside of the plugins:
 1. *extend_scenarios*: This method copies the scenario tags the given number of times. It automatically takes care about naming the entities in a unique way, when copying all attributes of the tag.
 2. *change_map*: As the name suggests, this lets you change the map of the carla simulator. In comparison to the native carla method for changing maps, this method gives you the ability to specify the timeout for loading new maps. It is also defaulted in such a way that also "slow" computers will work with it.
-3. *is_full_qualified_map_name*: Checks wether the provided map name is in the fully qualified format or not.
+3. *is_full_qualified_map_name*: Checks whether the provided map name is in the fully qualified format or not.
 4. *get_simple_map_name*: Given a fully qualified name, it will give you the simple name of a map, which is the last part of the fully qualified name.
 
 ## Scenarios
@@ -130,6 +131,13 @@ We provide several powerful tools, that are helpful in order to develop new feat
 
 ### Showing Spawnpoints and Waypoints of Intersections
 By running the python file **show_spawn_and_way_points.py** you can see all spawnpoints and all waypoits which belong to a certain junction. 
+
+## Generate the code documentation
+The projects code documentation is written in docstring and is making use of [Sphinx](https://www.sphinx-doc.org/en/master/index.html). Before generating the documentation, make sure you have installed all requirements. Then run the following commands:
+```shell script
+cd docs
+make html
+```
 
 ## Useful Links
 + [CARLA Driving Challenge](https://carlachallenge.org/challenge/nhtsa/)
