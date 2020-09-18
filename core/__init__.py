@@ -1,6 +1,6 @@
 """
 Core
-==============
+====
 .. automodule:: core.configuration
    :members:
    :undoc-members:
