@@ -1,9 +1,9 @@
-Welcome to Carla Pre Crash Scenario Generator's documentation!
-**************************************************************
+Carla Pre Crash Scenario Generator Code Documentation
+*****************************************************
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
 
 Generator
 =========
@@ -15,8 +15,6 @@ Generator
    :members:
    :undoc-members:
 
-Indices and tables
-==================
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. automodule:: plugins
+   :members:
+   :undoc-members:
