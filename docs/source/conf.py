@@ -63,7 +63,7 @@ html_static_path = ['_static']
 
 # Add custom css to html output
 html_theme_options = {
-    'page_width': '70%',
+    'page_width': 'auto',
     'github_repo': 'Magoli1/pre-crash-scenario-generator',
     'github_banner': 'true'
 }
