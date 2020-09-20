@@ -2,7 +2,7 @@ dataprovider: # optional, preload: False
   preload: True
 pipelines:
   # 1 Scenario ControlLoss
-  - ControlLoss_generated: # name will be used as output filename and overwritten in case it exists
+  - 1_ControlLoss_generated: # name will be used as output filename and overwritten in case it exists
       steps:
         - Scenario:
             name_prefix: ControlLoss_generated # optional, default <type>-idx
@@ -18,8 +18,8 @@ pipelines:
             generation_type: random_preset # chose from {random, random_preset} default: random_preset
             per_scenario: 5 # optional, default 1
 
-  # 2 Scenario FollowLeadingVehicle
-  - FollowLeadingVehicle_generated:
+  # 2.1 Scenario FollowLeadingVehicle
+  - 2_1_FollowLeadingVehicle_generated:
       steps:
         - Scenario:
             name_prefix: FollowLeadingVehicle_generated
@@ -34,8 +34,24 @@ pipelines:
             generation_type: random_preset
             per_scenario: 5
 
+  # 2.2 Scenario FollowLeadingVehicleWithObstacle
+  - 2_2_FollowLeadingVehicleWithObstacle_generated:
+      steps:
+        - Scenario:
+            name_prefix: FollowLeadingVehicleWithObstacle_generated
+            type: FollowLeadingVehicleWithObstacle
+        - Actor:
+            per_scenario: 5
+            tag: ego_vehicle
+            positioning:
+              junctions: False
+              streets: True
+        - Weather:
+            generation_type: random_preset
+            per_scenario: 5
+
   # 3 Scenario DynamicObjectCrossing
-  - ObjectCrossing_generated:
+  - 3_ObjectCrossing_generated:
       steps:
         - Scenario:
             name_prefix: DynamicObjectCrossing_generated
@@ -51,7 +67,7 @@ pipelines:
             per_scenario: 5
 
   # 4.1 Scenario VehicleTurningRight !!! TBD: Only right turns are allowed
-  - VehicleTurning_right_generated:
+  - 4_1_VehicleTurning_right_generated:
       steps:
         - Scenario:
             name_prefix: VehicleTurningRight_generated
@@ -67,7 +83,7 @@ pipelines:
             per_scenario: 5
 
   # 4.2 Scenario VehicleTurningLeft !!! TBD: Only left turns are allowed
-  - VehicleTurning_left_generated:
+  - 4_2_VehicleTurning_left_generated:
       steps:
         - Scenario:
             name_prefix: VehicleTurningLeft_generated
@@ -83,7 +99,7 @@ pipelines:
             per_scenario: 5
 
   # 5 Scenario OtherLeadingVehicle
-  - LeadingVehicle_generated:
+  - 5_LeadingVehicle_generated:
       steps:
         - Scenario:
             name_prefix: OtherLeadingVehicle_generated
@@ -99,7 +115,7 @@ pipelines:
             per_scenario: 5
 
   # 6 Scenario ManeuverOppositeDirection
-  - OppositeDirection_generated:
+  - 6_OppositeDirection_generated:
       steps:
         - Scenario:
             name_prefix: ManeuverOppositeDirection_generated
@@ -115,7 +131,7 @@ pipelines:
             per_scenario: 5
 
   # 7 Scenario OppositeVehicleRunningRedLight !!! TBD: Other actor must come from left of right
-  - RunningRedLight_generated:
+  - 7_RunningRedLight_generated:
       steps:
         - Scenario:
             name_prefix: OppositeVehicleRunningRedLight_generated
@@ -137,7 +153,7 @@ pipelines:
             per_scenario: 5
 
   # 8 Scenario SignalizedJunctionLeftTurn !!! TBD: Other actor must come from straight ahead
-  - SignalizedJunctionLeftTurn_generated:
+  - 8_SignalizedJunctionLeftTurn_generated:
       steps:
         - Scenario:
             name_prefix: SignalizedJunctionLeftTurn_generated
@@ -159,7 +175,7 @@ pipelines:
             per_scenario: 5
 
   # 9 Scenario SignalizedJunctionRightTurn !!! TBD: Other actor must come from left
-  - SignalizedJunctionRightTurn_generated:
+  - 9_SignalizedJunctionRightTurn_generated:
       steps:
         - Scenario:
             name_prefix: SignalizedJunctionRightTurn_generated
@@ -181,7 +197,7 @@ pipelines:
             per_scenario: 5
 
   # 10 Scenario SignalizedJunctionRightTurn !!! TBD: Other actor must come from left
-  - NoSignalJunction_generated:
+  - 10_NoSignalJunction_generated:
       steps:
         - Scenario:
             name_prefix: NoSignalJunctionCrossing_generated

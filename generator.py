@@ -11,6 +11,8 @@ import argparse
 
 
 def main():
+    """Main function that reads the configuration and starts the pipeline(s)
+    """
     args = get_args()
     generator_config = get_config(args.config)
     client = carla.Client(args.host, args.port)
@@ -21,6 +23,15 @@ def main():
 
 
 def start_pipeline(carla_client, generator_config, data_provider):
+    """Starts the pipeline and their steps
+
+    :param carla_client: Reference to the connected carla client
+    :type carla_client: object
+    :param generator_config: Configuration of the generator
+    :type generator_config: dict
+    :param data_provider: Reference to the data provider caching instance
+    :type data_provider: object
+    """
     pipelines = generator_config["pipelines"]
     if generator_config["dataprovider"]["preload"]:
         print("### START preloading data START ###")
@@ -48,6 +59,11 @@ def start_pipeline(carla_client, generator_config, data_provider):
 
 
 def get_args():
+    """Parses the command line arguments and sets defaults where necessary
+
+    :returns: The parsed arguments
+    :rtype: object
+    """
     argparser = argparse.ArgumentParser(description=__doc__)
     argparser.add_argument(
         '--host',

@@ -5,6 +5,13 @@ from core.helpers.utils import get_duplicates
 
 
 def set_default_values(config):
+    """Sets default values for all necessary values of the generator config
+
+    :param config: Generator configuration entity
+    :type config: dict
+    :returns: The configuration with set default values
+    :rtype: dict
+    """
     if "dataprovider" not in config:
         config["dataprovider"] = {"preload": False}
     if "preload" not in config["dataprovider"]:
@@ -12,8 +19,14 @@ def set_default_values(config):
     return config
 
 
-def check_valid_config(config):
-    # checks the configuration file for missing entities
+def preprocess_config(config):
+    """Preprocesses the configuration of the generator for missing attributes
+
+    :param config: Generator configuration entity
+    :type config: dict
+    :returns: The checked configuration with set default values
+    :rtype: dict
+    """
     if "pipelines" not in config:
         raise Exception("Config error: Mandatory 'pipelines' key not found in config")
     check_pipelines_config(config["pipelines"])
@@ -23,6 +36,11 @@ def check_valid_config(config):
 
 
 def check_pipelines_config(pipelines_config):
+    """Checks the configuration of a pipeline for validity
+
+    :param pipelines_config: Pipeline configuration entity
+    :type pipelines_config: dict
+    """
     if not isinstance(pipelines_config, list):
         raise Exception("Config error: 'pipelines' value needs to be a list")
     check_duplicate_pipeline_names(pipelines_config)
@@ -32,6 +50,11 @@ def check_pipelines_config(pipelines_config):
 
 
 def check_duplicate_pipeline_names(pipelines_config):
+    """Checks the configuration of all pipelines for duplicated names
+
+    :param pipelines_config: Pipelines configuration entity
+    :type pipelines_config: dict
+    """
     pipeline_names = [extract_pipeline_name(pipeline) for pipeline in pipelines_config]
     duplicates = get_duplicates(pipeline_names)
     if duplicates:
@@ -40,6 +63,13 @@ def check_duplicate_pipeline_names(pipelines_config):
 
 
 def check_pipeline_config_valid(idx, pipeline_config):
+    """Checks all the configuration entities of a pipeline
+
+    :param idx: Index of the pipeline step. Used for logging
+    :type idx: int
+    :param pipeline_config: Pipeline configuration entity
+    :type pipeline_config: dict
+    """
     if not isinstance(pipeline_config, dict):
         raise Exception(f'Config error at pipeline #{idx}: "pipeline" entity needs to be a dict')
     if "steps" not in pipeline_config:
@@ -48,6 +78,11 @@ def check_pipeline_config_valid(idx, pipeline_config):
 
 
 def check_data_provider_config_valid(data_provider_config):
+    """Checks the data provider configuration entity for validity
+
+    :param data_provider_config: Configuration entity of the data provider
+    :type data_provider_config: dict
+    """
     if not isinstance(data_provider_config, dict):
         raise Exception("Config error: 'dataprovider' value needs to be a dictionary")
     if "preload" in data_provider_config and not isinstance(data_provider_config["preload"], bool):
@@ -55,6 +90,13 @@ def check_data_provider_config_valid(data_provider_config):
 
 
 def check_steps_config_valid(idx, steps_config):
+    """Checks the steps of the pipeline configuration for validity
+
+    :param idx: Index of the pipeline step. Used for logging
+    :type idx: int
+    :param steps_config: Steps configuration entity of the pipeline
+    :type steps_config: dict
+    """
     if not isinstance(steps_config, list):
         raise Exception(f'Config error at pipeline #{idx}: "steps" value needs to be a list')
     # check if all configured pipeline steps actually exist via a class in the plugins section
@@ -64,4 +106,4 @@ def check_steps_config_valid(idx, steps_config):
     is_subset = set(pipeline_step_names).issubset(class_names)
     if not is_subset:
         raise Exception(
-            f'Config error at pipeline #{idx}: One or more of the configured steps do not correspond to a valid class name')
+            f'Config error at pipeline #{idx}: One or more of the configured steps do not correspond to a valid class name. Value needs to be in {class_names}')
