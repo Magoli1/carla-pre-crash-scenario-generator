@@ -23,13 +23,20 @@ class Actor:
         if config["per_scenario"] <= 0:
             raise Exception("Actor generators optional property 'per_scenario' cannot be <= 0")
         if "positioning" not in config:
-            config["positioning"] = {"junctions": True, "streets": True, "distance_between": 5}
-        pos_config = config["positioning"]
-        if "junctions" not in pos_config:
-            pos_config["junctions"] = True
-        if "streets" not in pos_config:
-            pos_config["streets"] = True
-        if not pos_config["streets"] and not pos_config["junctions"]:
+            config["positioning"] = {"junctions": {"straight": True, "left": True, "right": True},
+                                     "streets": True,
+                                     "distance_between": 5}
+        if "junctions" not in config["positioning"]:
+            config["positioning"]["junctions"] = {"straight": True, "left": True, "right": True}
+        if "straight" not in config["positioning"]["junctions"]:
+            config["positioning"]["junctions"]["straight"] = True
+        if "left" not in config["positioning"]["junctions"]:
+            config["positioning"]["junctions"]["left"] = True
+        if "right" not in config["positioning"]["junctions"]:
+            config["positioning"]["junctions"]["right"] = True
+        if "streets" not in config["positioning"]:
+            config["positioning"]["streets"] = True
+        if not config["positioning"]["streets"] and not config["positioning"]["junctions"]:
             raise Exception(
                 "Actor generators optional properties 'streets' and 'junctions' cannot both be 'False'")
         self.config = config
@@ -50,8 +57,15 @@ class Actor:
         pos_config = self.config["positioning"]
         waypoints_in_town = self.data_provider.get_waypoints_per_map()[town_name]
         allowed_waypoints = []
-        if pos_config["junctions"]:
-            allowed_waypoints += waypoints_in_town["junctions"]
+        if pos_config["junctions"]["straight"]:
+            allowed_waypoints += [waypoints[0] for junction in waypoints_in_town["junctions"].values()
+                                  for waypoints in junction["waypoints_with_straight_turn"]]
+        if pos_config["junctions"]["left"]:
+            allowed_waypoints += [waypoints[0] for junction in waypoints_in_town["junctions"].values()
+                                  for waypoints in junction["waypoints_with_left_turn"]]
+        if pos_config["junctions"]["right"]:
+            allowed_waypoints += [waypoints[0] for junction in waypoints_in_town["junctions"].values()
+                                  for waypoints in junction["waypoints_with_right_turn"]]
         if pos_config["streets"]:
             allowed_waypoints += waypoints_in_town["streets"]
         return allowed_waypoints

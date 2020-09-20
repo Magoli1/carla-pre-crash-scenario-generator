@@ -1,0 +1,20 @@
+dataprovider: # optional, preload: False
+  preload: True
+pipelines:
+  - MinimalExample:
+      steps:
+        - Scenario:
+            name_prefix: MinimalExample
+            type: MinimalExample
+        - Actor:
+            per_scenario: 5
+            tag: ego_vehicle
+            positioning:
+                junctions:
+                    straight: False
+                    left: False
+                    right: True
+                streets: False
+        - Weather:
+            generation_type: random_preset
+            per_scenario: 5

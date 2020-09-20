@@ -1,5 +1,7 @@
 import copy
 import time
+import carla
+from collections import defaultdict
 
 
 def is_full_qualified_map_name(name):
@@ -19,13 +21,127 @@ def get_simple_map_name(full_qualified_name):
 
 
 def get_junction_waypoints(waypoints):
-    return [waypoint for waypoint in waypoints if waypoint.is_junction]
+    d = defaultdict(lambda: defaultdict(list))
+    junction_waypoints = [(waypoint.get_junction().id, waypoint.get_junction(), waypoint)
+                          for waypoint in waypoints if waypoint.is_junction]
+    for k, obj, v in junction_waypoints:
+        d[k]["object"] = obj
+        d[k]["waypoints_in_junction"].append(v)
+
+    return dict(d)
 
 
 def get_street_waypoints(waypoints, min_dist_before_junction=50):
     return [waypoint for waypoint in waypoints if
             not waypoint.is_junction and
             len(waypoint.next_until_lane_end(1)) > min_dist_before_junction]
+
+
+def get_traffic_lights_at_junction(carla_client, current_map, map_name, junctions_per_map):
+    for tl in carla_client.get_world().get_actors().filter('traffic.traffic_light*'):
+        point = current_map.get_waypoint(tl.get_location(), project_to_road=True,
+                                         lane_type=carla.LaneType.Driving)
+        tries = 0
+        switch = False
+        virgin = True
+        threshold = 11
+        start_point = point
+        try:
+            while not point.is_junction:
+                # TODO Config EU/US map
+                # Problem maps: Town3, Town4, Town5, Town6, Town7, Town10HD
+                if map_name in ['Town01, Town02']:
+                    point = point.next(1.0)[0]
+                else:
+                    if tries > threshold and virgin:
+                        switch = True
+                        virgin = False
+                        tries = 0
+                        point = start_point
+                    elif tries > threshold and not virgin:
+                        print("Junction not found in set threshold.")
+                        continue
+
+                    if switch and not virgin:
+                        point = point.next(1.0)[0]
+                        tries += 1
+                    else:
+                        try:
+                            point = point.previous(1.0)[0]
+                            tries += 1
+                        except IndexError:
+                            tries = threshold + 1
+        except IndexError:
+            print("Junction not found because lane ended earlier.")
+            continue
+
+        junction = point.get_junction()
+        junctions_per_map[junction.id]["traffic_lights"].append(tl)
+
+    return junctions_per_map
+
+
+def get_junction_directions(junctions_per_map):
+    for junction_id, junction in junctions_per_map.items():
+        junction_waypoints = junction["object"].get_waypoints(carla.LaneType.Driving)
+        already_seen_waypoints = []
+        for lane_id, lane in enumerate(junction_waypoints):
+            for waypoint in lane:
+                # Check if waypoint is an end-waypoint and map it back to the beginning of the
+                # connecting road
+                if waypoint.next(10.0)[0].road_id != waypoint.road_id:
+                    while waypoint.previous(0.5)[0].road_id == waypoint.road_id:
+                        waypoint = waypoint.previous(0.5)[0]
+                start_waypoint = waypoint
+
+                # Check if start-waypoint is part of an already tracked connecting road (road + lane)
+                if [start_waypoint.road_id, start_waypoint.lane_id] in already_seen_waypoints:
+                    continue
+                else:
+                    already_seen_waypoints.append([start_waypoint.road_id, start_waypoint.lane_id])
+
+                # Determine incoming road
+                waypoint_incoming_road = start_waypoint
+                connecting_road_id = start_waypoint.road_id
+                while waypoint_incoming_road.road_id == connecting_road_id:
+                    waypoint_incoming_road = waypoint_incoming_road.previous(0.5)[0]
+
+                # Determine end-waypoint of the connecting road
+                end_waypoint = start_waypoint
+                while end_waypoint.next(0.5)[0].road_id == end_waypoint.road_id:
+                    end_waypoint = end_waypoint.next(0.5)[0]
+
+                # Determine outgoing road
+                waypoint_outgoing_road = end_waypoint.next(0.5)[0]
+
+                # Compute position of end-waypoint relative to start-waypoint,
+                # to determine the turn's direction
+                threshold = 35
+                n = end_waypoint.transform.rotation.yaw
+                n = n % 360.0
+                c = start_waypoint.transform.rotation.yaw
+                c = c % 360.0
+                diff_angle = (n - c) % 180.0
+                if diff_angle < threshold or diff_angle > (180 - threshold):
+                    # return RoadOption.STRAIGHT
+                    junctions_per_map[junction_id]["waypoints_with_straight_turn"].append(
+                        (waypoint_incoming_road,
+                         start_waypoint,
+                         waypoint_outgoing_road))
+                elif diff_angle > 90.0:
+                    # return RoadOption.LEFT
+                    junctions_per_map[junction_id]["waypoints_with_left_turn"].append(
+                        (waypoint_incoming_road,
+                         start_waypoint,
+                         waypoint_outgoing_road))
+                else:
+                    # return RoadOption.RIGHT
+                    junctions_per_map[junction_id]["waypoints_with_right_turn"].append(
+                        (waypoint_incoming_road,
+                         start_waypoint,
+                         waypoint_outgoing_road))
+
+    return junctions_per_map
 
 
 def change_map(carla_client, map_name, number_tries=10, timeout=2):
