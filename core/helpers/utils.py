@@ -42,7 +42,7 @@ def get_simple_map_name(full_qualified_name):
 
 
 def get_junction_waypoints(waypoints):
-  """Filters the waypoints for the ones on a junction
+    """Filters the waypoints for the ones on a junction
 
     :param waypoints: A list of unfiltered waypoints
     :type waypoints: list

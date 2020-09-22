@@ -26,8 +26,10 @@ class Actor:
             config["positioning"] = {"junctions": {"straight": True, "left": True, "right": True},
                                      "streets": True,
                                      "distance_between": 5}
-        if "junctions" not in config["positioning"]:
+        if "junctions" not in config["positioning"] or config["positioning"]["junctions"] is True:
             config["positioning"]["junctions"] = {"straight": True, "left": True, "right": True}
+        elif config["positioning"]["junctions"] is False:
+            config["positioning"]["junctions"] = {"straight": False, "left": False, "right": False}
         if "straight" not in config["positioning"]["junctions"]:
             config["positioning"]["junctions"]["straight"] = True
         if "left" not in config["positioning"]["junctions"]:
@@ -36,9 +38,12 @@ class Actor:
             config["positioning"]["junctions"]["right"] = True
         if "streets" not in config["positioning"]:
             config["positioning"]["streets"] = True
-        if not config["positioning"]["streets"] and not config["positioning"]["junctions"]:
+        if (not config["positioning"]["streets"]
+                and all(switch is False for switch in config["positioning"]["junctions"].values())):
             raise Exception(
-                "Actor generators optional properties 'streets' and 'junctions' cannot both be 'False'")
+                "Actor generators optional properties 'streets' "
+                "and all directions in 'junctions' cannot both be 'False'"
+            )
         self.config = config
         self.data_provider = data_provider
         self.step_idx = step_idx
