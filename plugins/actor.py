@@ -1,3 +1,5 @@
+import pprint
+
 from xml.etree.ElementTree import SubElement
 
 from core.helpers.utils import extend_scenarios
@@ -64,12 +66,18 @@ class Actor:
             attributes = {}
             if self.config["tag"] == "other_actor":
                 allowed_waypoints = self.get_allowed_waypoints_in_town(scenario.get("town"))
+                # print(scenario.find("ego_vehicle").items())
             else:
                 allowed_waypoints = self.get_allowed_waypoints_in_town(scenario.get("town"))
             if not allowed_waypoints:
                 tree.getroot().remove(scenario)
                 continue
-            attributes["waypoint"] = random.choice(allowed_waypoints)
+            waypoint = random.choice(allowed_waypoints)
+            attributes["waypoint"] = waypoint[0]
+            if waypoint[3]:
+                attributes["junction_id"] = waypoint[3]
+            if waypoint[1]:
+                attributes["start_point_yaw"] = waypoint[1]
             attributes["actor_model"] = random.choice(self.actor_models)
             self.decorate_actor(actor, **attributes)
 
@@ -78,16 +86,18 @@ class Actor:
         waypoints_in_town = self.data_provider.get_waypoints_per_map()[town_name]
         allowed_waypoints = []
         if pos_config["junctions"]["straight"]:
-            allowed_waypoints += [waypoints[0] for junction in waypoints_in_town["junctions"].values()
+            allowed_waypoints += [(*waypoints, junction["object"].id) for junction in waypoints_in_town["junctions"].values()
                                   for waypoints in junction["waypoints_with_straight_turn"]]
         if pos_config["junctions"]["left"]:
-            allowed_waypoints += [waypoints[0] for junction in waypoints_in_town["junctions"].values()
+            allowed_waypoints += [(*waypoints, junction["object"].id) for junction in waypoints_in_town["junctions"].values()
                                   for waypoints in junction["waypoints_with_left_turn"]]
         if pos_config["junctions"]["right"]:
-            allowed_waypoints += [waypoints[0] for junction in waypoints_in_town["junctions"].values()
+            allowed_waypoints += [(*waypoints, junction["object"].id) for junction in waypoints_in_town["junctions"].values()
                                   for waypoints in junction["waypoints_with_right_turn"]]
         if pos_config["streets"]:
-            allowed_waypoints += waypoints_in_town["streets"]
+            allowed_waypoints += [(waypoint, None, None, None)
+                                  for waypoint in waypoints_in_town["streets"]]
+
         return allowed_waypoints
 
     def decorate_actor(self, actor, **kwargs):
@@ -99,4 +109,10 @@ class Actor:
 
         if "actor_model" in kwargs:
             actor.set("model", kwargs["actor_model"])
-        pass
+
+        if "junction_id" in kwargs:
+            actor.set("junction_id", str(kwargs["junction_id"]))
+
+        if "start_point_yaw" in kwargs:
+            actor.set("start_point_yaw", str(
+                round(kwargs["start_point_yaw"].transform.rotation.yaw, 2)))
