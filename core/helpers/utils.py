@@ -71,19 +71,33 @@ def get_junction_waypoints(waypoints):
     return dict(d)
 
 
-def get_street_waypoints(waypoints, min_dist_before_junction=50):
+def get_street_waypoints(waypoints, min_dist_before_junction=80, min_dist_after_junction=10):
     """Filters the waypoints for the ones on a street
 
     :param waypoints: A list of unfiltered waypoints
     :type waypoints: list
     :param min_dist_before_junction: Distance before a junction
     :type min_dist_before_junction: int
+    :param min_dist_after_junction: Distance after a junction
+    :type min_dist_after_junction: int
     :returns: Waypoints that lay on a street
     :rtype: list
     """
-    return [waypoint for waypoint in waypoints if
-            not waypoint.is_junction and
-            len(waypoint.next_until_lane_end(1)) > min_dist_before_junction]
+    # Get rid of waypoints too close to a junction (in front)
+    waypoints = [waypoint for waypoint in waypoints if
+                 not waypoint.is_junction and
+                 len(waypoint.next_until_lane_end(1)) > min_dist_before_junction]
+
+    # Get rid of waypoints too close to a junction (in back)
+    valid_waypoints = []
+    for waypoint in waypoints:
+        prev_waypoints_in_junction = [prev_waypoint for prev_waypoint in
+                                      waypoint.previous(min_dist_after_junction) if
+                                      prev_waypoint.is_junction]
+        if len(prev_waypoints_in_junction) == 0:
+            valid_waypoints.append(waypoint)
+
+    return valid_waypoints
 
 
 def get_traffic_lights_at_junction(carla_client, current_map, map_name, junctions_per_map):

@@ -13,6 +13,8 @@ class Actor:
         self.actor_models = [actor.id for actor in
                              self.client.get_world().get_blueprint_library().filter(
                                  config["type"])]
+        self.actor_models.remove('vehicle.bh.crossbike')
+
         if "tag" not in config:
             config["tag"] = "ego_vehicle"
         if config["tag"] not in ["ego_vehicle", "other_actor"]:
