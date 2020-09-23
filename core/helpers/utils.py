@@ -166,7 +166,7 @@ def get_junction_directions(junctions_per_map):
                 # Compute position of end-waypoint relative to start-waypoint,
                 # to determine the turn's direction
                 direction = get_direction_between_points(start_waypoint, end_waypoint)
-                if direction == RoadDirection.STRAIGHT or direction == RoadDirection.BACK:
+                if direction == RoadDirection.FRONT or direction == RoadDirection.BACK:
                     junctions_per_map[junction_id]["waypoints_with_straight_turn"].append(
                         (waypoint_incoming_road,
                          start_waypoint,
