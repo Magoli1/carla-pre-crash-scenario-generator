@@ -44,6 +44,15 @@ class Actor:
                 "Actor generators optional properties 'streets' "
                 "and all directions in 'junctions' cannot both be 'False'"
             )
+        if "relative_to_ego" not in config["positioning"]["junctions"]:
+            config["positioning"]["junctions"]["relative_to_ego"] \
+                = {"straight": False, "left": False, "right": False}
+        if "straight" not in config["positioning"]["junctions"]["relative_to_ego"]:
+            config["positioning"]["junctions"]["relative_to_ego"]["straight"] = True
+        if "left" not in config["positioning"]["junctions"]["relative_to_ego"]:
+            config["positioning"]["junctions"]["relative_to_ego"]["left"] = True
+        if "right" not in config["positioning"]["junctions"]["relative_to_ego"]:
+            config["positioning"]["junctions"]["relative_to_ego"]["right"] = True
         self.config = config
         self.data_provider = data_provider
         self.step_idx = step_idx
@@ -53,8 +62,14 @@ class Actor:
         for scenario in tree.getroot().getchildren():
             actor = SubElement(scenario, self.config["tag"])
             attributes = {}
-            attributes["waypoint"] = random.choice(
-                self.get_allowed_waypoints_in_town(scenario.get("town")))
+            if self.config["tag"] == "other_actor":
+                allowed_waypoints = self.get_allowed_waypoints_in_town(scenario.get("town"))
+            else:
+                allowed_waypoints = self.get_allowed_waypoints_in_town(scenario.get("town"))
+            if not allowed_waypoints:
+                tree.getroot().remove(scenario)
+                continue
+            attributes["waypoint"] = random.choice(allowed_waypoints)
             attributes["actor_model"] = random.choice(self.actor_models)
             self.decorate_actor(actor, **attributes)
 

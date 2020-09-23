@@ -5,14 +5,15 @@ from collections import defaultdict
 from enum import Enum
 
 
-class RoadOption(Enum):
+class RoadDirection(Enum):
     """
-    RoadOption represents the possible topological configurations
-    when moving from a segment of lane to other.
+    RoadDirection represents the direction of the lane
+    between two waypoints.
     """
     LEFT = 1
     RIGHT = 2
-    STRAIGHT = 3
+    FRONT = 3
+    BACK = 4
 
 
 def is_full_qualified_map_name(name):
@@ -165,17 +166,17 @@ def get_junction_directions(junctions_per_map):
                 # Compute position of end-waypoint relative to start-waypoint,
                 # to determine the turn's direction
                 direction = get_direction_between_points(start_waypoint, end_waypoint)
-                if direction == RoadOption.STRAIGHT:
+                if direction == RoadDirection.STRAIGHT or direction == RoadDirection.BACK:
                     junctions_per_map[junction_id]["waypoints_with_straight_turn"].append(
                         (waypoint_incoming_road,
                          start_waypoint,
                          waypoint_outgoing_road))
-                elif direction == RoadOption.LEFT:
+                elif direction == RoadDirection.LEFT:
                     junctions_per_map[junction_id]["waypoints_with_left_turn"].append(
                         (waypoint_incoming_road,
                          start_waypoint,
                          waypoint_outgoing_road))
-                elif direction == RoadOption.RIGHT:
+                elif direction == RoadDirection.RIGHT:
                     junctions_per_map[junction_id]["waypoints_with_right_turn"].append(
                         (waypoint_incoming_road,
                          start_waypoint,
@@ -186,7 +187,7 @@ def get_junction_directions(junctions_per_map):
 
 def get_direction_between_points(start_waypoint: carla.Waypoint,
                                  end_waypoint: carla.Waypoint,
-                                 threshold: int = 35) -> RoadOption:
+                                 threshold: int = 35) -> RoadDirection:
     """Compute the direction of a lane between a start and an end point
 
     The function calculates the direction of a lane using the yaw values
@@ -199,19 +200,21 @@ def get_direction_between_points(start_waypoint: carla.Waypoint,
     :param threshold: The threshold value for the angle when determining the direction
     :type threshold: int
     :returns: Direction of the lane between the two waypoints
-    :rtype: RoadOption
+    :rtype: RoadDirection
     """
     n = end_waypoint.transform.rotation.yaw
     n = n % 360.0
     c = start_waypoint.transform.rotation.yaw
     c = c % 360.0
     diff_angle = (n - c) % 180.0
-    if diff_angle < threshold or diff_angle > (180 - threshold):
-        return RoadOption.STRAIGHT
+    if diff_angle < threshold:
+        return RoadDirection.BACK
+    elif diff_angle > (180 - threshold):
+        return RoadDirection.FRONT
     elif diff_angle > 90.0:
-        return RoadOption.LEFT
+        return RoadDirection.LEFT
     else:
-        return RoadOption.RIGHT
+        return RoadDirection.RIGHT
 
 
 def change_map(carla_client, map_name, number_tries=10, timeout=2):
