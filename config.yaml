@@ -140,13 +140,23 @@ pipelines:
             per_scenario: 5
             tag: ego_vehicle
             positioning:
-                junctions: True
+                junctions:
+                  straight: True
+                  left: False
+                  right: False
                 streets: False
         - Actor:
             per_scenario: 5
             tag: other_actor
             positioning:
-                junctions: True
+                junctions:
+                  straight: True
+                  left: True
+                  right: False
+                  relative_to_ego:
+                    straight: False
+                    left: True
+                    right: True
                 streets: False
         - Weather:
             generation_type: random_preset
@@ -162,13 +172,23 @@ pipelines:
             per_scenario: 5
             tag: ego_vehicle
             positioning:
-                junctions: True
+                junctions:
+                  straight: False
+                  left: True
+                  right: False
                 streets: False
         - Actor:
             per_scenario: 5
             tag: other_actor
             positioning:
-                junctions: True
+                junctions:
+                  straight: True
+                  left: False
+                  right: False
+                  relative_to_ego:
+                    straight: True
+                    left: False
+                    right: False
                 streets: False
         - Weather:
             generation_type: random_preset
@@ -184,13 +204,23 @@ pipelines:
             per_scenario: 5
             tag: ego_vehicle
             positioning:
-                junctions: True
+                junctions:
+                  straight: False
+                  left: False
+                  right: True
                 streets: False
         - Actor:
             per_scenario: 5
             tag: other_actor
             positioning:
-                junctions: True
+                junctions:
+                  straight: True
+                  left: False
+                  right: False
+                  relative_to_ego:
+                    straight: False
+                    left: True
+                    right: False
                 streets: False
         - Weather:
             generation_type: random_preset
@@ -206,13 +236,23 @@ pipelines:
             per_scenario: 5
             tag: ego_vehicle
             positioning:
-                junctions: True
+                junctions:
+                  straight: True
+                  left: True
+                  right: True
                 streets: False
         - Actor:
             per_scenario: 5
             tag: other_actor
             positioning:
-                junctions: True
+                junctions:
+                  straight: True
+                  left: True
+                  right: True
+                  relative_to_ego:
+                    straight: True
+                    left: True
+                    right: True
                 streets: False
         - Weather:
             generation_type: random_preset

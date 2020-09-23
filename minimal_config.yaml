@@ -10,24 +10,24 @@ pipelines:
             per_scenario: 5
             tag: ego_vehicle
             positioning:
-                junctions:
-                    straight: False
-                    left: False
-                    right: True
-                streets: False
+              junctions:
+                straight: False
+                left: False
+                right: True
+              streets: False
         - Actor:
             per_scenario: 5
             tag: other_actor
             positioning:
-                junctions:
-                    straight: False
-                    left: False
-                    right: True
-                    relative_to_ego:
-                      straight: False
-                      left: True
-                      right: True
-                streets: False
+              junctions:
+                straight: False
+                left: False
+                right: True
+                relative_to_ego:
+                  straight: False
+                  left: True
+                  right: True
+              streets: False
         - Weather:
             generation_type: random_preset
             per_scenario: 5
