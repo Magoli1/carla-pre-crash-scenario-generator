@@ -37,9 +37,6 @@ class Actor:
         if "right" not in config["positioning"]["junctions"]:
             config["positioning"]["junctions"]["right"] = True
 
-        if config["tag"] != "other_actor" and "streets" not in config["positioning"]:
-            config["positioning"]["streets"] = True
-
         if "relative_to_ego" not in config["positioning"]["junctions"]:
             config["positioning"]["junctions"]["relative_to_ego"] \
                 = {"straight": True, "left": True, "right": True}
@@ -50,23 +47,30 @@ class Actor:
         if "right" not in config["positioning"]["junctions"]["relative_to_ego"]:
             config["positioning"]["junctions"]["relative_to_ego"]["right"] = True
 
-        if (config["tag"] == "other_actor"
-                and all(switch is False for switch in config["positioning"]["junctions"]["relative_to_ego"].values())):
-            raise Exception(
-                "Actor generators optional properties in "
-                "'relative_to_ego' cannot all be 'False' for 'other_actor'"
-            )
-        if config["tag"] == "other_actor" and config["positioning"].get("streets") is True:
-            raise Exception(
-                "Actor generators optional property 'streets' "
-                "cannot be 'True' for 'other_actor'"
-            )
+        if "streets" not in config["positioning"]:
+            if (config["tag"] != "other_actor" or
+                all(switch is False for switch in config["positioning"]["junctions"].values()
+                    if isinstance(switch, bool))):
+                config["positioning"]["streets"] = True
+            else:
+                config["positioning"]["streets"] = False
+
         if (not config["positioning"]["streets"]
                 and all(switch is False for switch in config["positioning"]["junctions"].values()
                         if isinstance(switch, bool))):
             raise Exception(
                 "Actor generators optional properties 'streets' "
                 "and all directions in 'junctions' cannot both be 'False'"
+            )
+
+        if (config["tag"] == "other_actor"
+            and not all(switch is False for switch
+                        in config["positioning"]["junctions"]["relative_to_ego"].values())
+            and all(switch is False for switch in config["positioning"]["junctions"].values()
+                    if isinstance(switch, bool))):
+            raise Exception(
+                "Actor generators optional properties of 'relative_to_ego' "
+                "cannot be 'True' if all directions in 'junctions' are 'False'"
             )
 
         self.config = config
@@ -99,6 +103,8 @@ class Actor:
                 allowed_waypoints = self.get_allowed_waypoints_in_town(scenario.get("town"))
             if not allowed_waypoints:
                 tree.getroot().remove(scenario)
+                print(f"One Scenario was removed, because there is no "
+                      f"allowed waypoint for {self.config['tag']}")
                 continue
             waypoint = random.choice(allowed_waypoints)
             attributes["waypoint"] = waypoint[0]
@@ -117,7 +123,10 @@ class Actor:
 
         if relative_to_ego:
             if not junction_id or not start_point_yaw:
-                return []
+                if pos_config["streets"]:
+                    return [(waypoint, None, None, None) for waypoint in waypoints_in_town["streets"]]
+                else:
+                    return []
 
             allowed_directions = []
             if pos_config["junctions"]["relative_to_ego"]["straight"]:
