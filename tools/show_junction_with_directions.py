@@ -19,7 +19,6 @@ def main():
     try:
 
         dist = 5.0  # Distance between all waypoints generated
-        visualize = True  # Switch for visualizing waypoints
 
         client = carla.Client('localhost', 2000)
         world = client.get_world()
@@ -38,19 +37,6 @@ def main():
 
         print("Number of waypoints belonging to junction {}".format(
             len(waypoints_belonging_2_junction)))
-
-        if visualize == True:
-            for w in waypoints_belonging_2_junction:
-                world.debug.draw_string(w.transform.location, 'O', draw_shadow=False,
-                                        color=carla.Color(r=255, g=0, b=0), life_time=10.0,
-                                        persistent_lines=True)
-
-        # Get all spawn points
-        spawn_points = map.get_spawn_points()
-        for spawn_point in spawn_points:
-            world.debug.draw_string(spawn_point.location, 'X', draw_shadow=False,
-                                    color=carla.Color(r=0, g=255, b=0), life_time=999.0,
-                                    persistent_lines=True)
 
         # Get Junction waypoints
         junction_waypoints = waypoints_belonging_2_junction[0].get_junction().get_waypoints(carla.LaneType.Driving)
@@ -94,28 +80,26 @@ def main():
                 c = c % 360.0
                 diff_angle = (n - c) % 180.0
                 if diff_angle < threshold or diff_angle > (180 - threshold):
-                    # return RoadOption.STRAIGHT
+                    # STRAIGHT
                     world.debug.draw_string(wp_end.transform.location,
                                             f'E Straight - {wp_end.road_id}',
                                             draw_shadow=False,
                                             color=carla.Color(r=r, g=g, b=b), life_time=999.0,
                                             persistent_lines=True)
                 elif diff_angle > 90.0:
-                    # return RoadOption.LEFT
+                    # LEFT
                     world.debug.draw_string(wp_end.transform.location,
                                             f'E Left - {wp_end.road_id}',
                                             draw_shadow=False,
                                             color=carla.Color(r=r, g=g, b=b), life_time=999.0,
                                             persistent_lines=True)
                 else:
-                    # return RoadOption.RIGHT
+                    # RIGHT
                     world.debug.draw_string(wp_end.transform.location,
                                             f'E Right - {wp_end.road_id}',
                                             draw_shadow=False,
                                             color=carla.Color(r=r, g=g, b=b), life_time=999.0,
                                             persistent_lines=True)
-
-            print('#' * 10)
 
     finally:
         print('Done.')
