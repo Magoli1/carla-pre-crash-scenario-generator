@@ -165,7 +165,8 @@ def get_junction_directions(junctions_per_map):
 
                 # Compute position of end-waypoint relative to start-waypoint,
                 # to determine the turn's direction
-                direction = get_direction_between_points(start_waypoint, end_waypoint)
+                direction = get_direction_between_points(start_waypoint.transform.rotation.yaw,
+                                                         end_waypoint.transform.rotation.yaw)
                 if direction == RoadDirection.FRONT or direction == RoadDirection.BACK:
                     junctions_per_map[junction_id]["waypoints_with_straight_turn"].append(
                         (waypoint_incoming_road,
@@ -185,27 +186,25 @@ def get_junction_directions(junctions_per_map):
     return junctions_per_map
 
 
-def get_direction_between_points(start_waypoint: carla.Waypoint,
-                                 end_waypoint: carla.Waypoint,
+def get_direction_between_points(yaw_start: float,
+                                 yaw_end: float,
                                  threshold: int = 35) -> RoadDirection:
     """Compute the direction of a lane between a start and an end point
 
     The function calculates the direction of a lane using the yaw values
     (rotation around the Z axis) of the start and end waypoints.
 
-    :param start_waypoint: The start waypoint of the lane
-    :type start_waypoint: carla.Waypoint
-    :param end_waypoint: The end waypoint of the lane
-    :type end_waypoint: carla.Waypoint
+    :param yaw_start: The rotation around the Z axis of the start waypoint
+    :type yaw_start: float
+    :param yaw_end: The rotation around the Z axis of the end waypoint
+    :type yaw_end: float
     :param threshold: The threshold value for the angle when determining the direction
     :type threshold: int
     :returns: Direction of the lane between the two waypoints
     :rtype: RoadDirection
     """
-    n = end_waypoint.transform.rotation.yaw
-    n = n % 360.0
-    c = start_waypoint.transform.rotation.yaw
-    c = c % 360.0
+    n = yaw_end % 360.0
+    c = yaw_start % 360.0
     diff_angle = (n - c) % 180.0
     if diff_angle < threshold:
         return RoadDirection.BACK

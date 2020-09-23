@@ -1,6 +1,6 @@
 from xml.etree.ElementTree import SubElement
 
-from core.helpers.utils import extend_scenarios
+from core.helpers.utils import extend_scenarios, RoadDirection, get_direction_between_points
 
 import random
 
@@ -118,6 +118,31 @@ class Actor:
         if relative_to_ego:
             if not junction_id or not start_point_yaw:
                 return []
+
+            allowed_directions = []
+            if pos_config["junctions"]["relative_to_ego"]["straight"]:
+                allowed_directions.append(RoadDirection.FRONT)
+            if pos_config["junctions"]["relative_to_ego"]["left"]:
+                allowed_directions.append(RoadDirection.LEFT)
+            if pos_config["junctions"]["relative_to_ego"]["right"]:
+                allowed_directions.append(RoadDirection.RIGHT)
+
+            possible_waypoints = []
+            if pos_config["junctions"]["straight"]:
+                possible_waypoints += [(*waypoints, junction_id) for waypoints
+                                      in waypoints_in_town["junctions"][junction_id]["waypoints_with_straight_turn"]]
+            if pos_config["junctions"]["left"]:
+                possible_waypoints += [(*waypoints, junction_id) for waypoints
+                                      in waypoints_in_town["junctions"][junction_id]["waypoints_with_left_turn"]]
+            if pos_config["junctions"]["right"]:
+                possible_waypoints += [(*waypoints, junction_id) for waypoints
+                                      in waypoints_in_town["junctions"][junction_id]["waypoints_with_right_turn"]]
+
+            for waypoints in possible_waypoints:
+                if get_direction_between_points(
+                        start_point_yaw,
+                        waypoints[1].transform.rotation.yaw) in allowed_directions:
+                    allowed_waypoints.append((*waypoints, junction_id))
 
         else:
             if pos_config["junctions"]["straight"]:
