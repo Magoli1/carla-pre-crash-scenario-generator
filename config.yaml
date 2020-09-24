@@ -15,7 +15,6 @@ pipelines:
                 junctions: False
                 streets: True
             four_wheelers_only: True # optional, default: True
-            model: null # optional, default null, example: vehicle.tesla.model3
         - Weather:
             generation_type: random_preset # chose from {random, random_preset} default: random_preset
             per_scenario: 5 # optional, default 1
