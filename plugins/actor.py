@@ -10,11 +10,19 @@ class Actor:
         self.client = carla_client
         if "type" not in config:
             config["type"] = "vehicle"
-        self.actor_models = [actor.id for actor in
-                             self.client.get_world().get_blueprint_library().filter(
-                                 config["type"])]
-        self.actor_models.remove('vehicle.bh.crossbike')
-
+        self.actor_models = []
+        available_actors = [actor for actor in
+                            self.client.get_world().get_blueprint_library().filter(config["type"])]
+        if "four_wheelers_only" not in config:
+            config["four_wheelers_only"] = True
+        if "model" in config and config["model"]:
+            self.actor_models = [config["model"]]
+        elif config["four_wheelers_only"]:
+            for actor in available_actors:
+                if actor.has_attribute('number_of_wheels') and actor.get_attribute('number_of_wheels').as_int() == 4:
+                    self.actor_models.append(actor.id)
+        else:
+            self.actor_models = [actor.id for actor in available_actors]
         if "tag" not in config:
             config["tag"] = "ego_vehicle"
         if config["tag"] not in ["ego_vehicle", "other_actor"]:

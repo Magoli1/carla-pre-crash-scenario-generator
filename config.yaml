@@ -14,6 +14,8 @@ pipelines:
             positioning: # optional, default junctions: True, streets: True
                 junctions: False
                 streets: True
+            four_wheelers_only: True # optional, default: True
+            model: null # optional, default null, example: vehicle.tesla.model3
         - Weather:
             generation_type: random_preset # chose from {random, random_preset} default: random_preset
             per_scenario: 5 # optional, default 1
@@ -30,6 +32,7 @@ pipelines:
             positioning:
                 junctions: False
                 streets: True
+            four_wheelers_only: True
         - Weather:
             generation_type: random_preset
             per_scenario: 5
@@ -46,6 +49,7 @@ pipelines:
             positioning:
               junctions: False
               streets: True
+            four_wheelers_only: True
         - Weather:
             generation_type: random_preset
             per_scenario: 5
@@ -62,6 +66,7 @@ pipelines:
             positioning:
                 junctions: False
                 streets: True
+            four_wheelers_only: True
         - Weather:
             generation_type: random_preset
             per_scenario: 5
@@ -78,6 +83,7 @@ pipelines:
             positioning:
                 junctions: True
                 streets: False
+            four_wheelers_only: True
         - Weather:
             generation_type: random_preset
             per_scenario: 5
@@ -94,6 +100,7 @@ pipelines:
             positioning:
                 junctions: True
                 streets: False
+            four_wheelers_only: True
         - Weather:
             generation_type: random_preset
             per_scenario: 5
@@ -110,6 +117,7 @@ pipelines:
             positioning:
                 junctions: False
                 streets: True
+            four_wheelers_only: True
         - Weather:
             generation_type: random_preset
             per_scenario: 5
@@ -126,6 +134,7 @@ pipelines:
             positioning:
                 junctions: False
                 streets: True
+            four_wheelers_only: True
         - Weather:
             generation_type: random_preset
             per_scenario: 5
@@ -142,12 +151,14 @@ pipelines:
             positioning:
                 junctions: True
                 streets: False
+            four_wheelers_only: True
         - Actor:
             per_scenario: 5
             tag: other_actor
             positioning:
                 junctions: True
                 streets: False
+            four_wheelers_only: False
         - Weather:
             generation_type: random_preset
             per_scenario: 5
@@ -164,12 +175,14 @@ pipelines:
             positioning:
                 junctions: True
                 streets: False
+            four_wheelers_only: True
         - Actor:
             per_scenario: 5
             tag: other_actor
             positioning:
                 junctions: True
                 streets: False
+            four_wheelers_only: False
         - Weather:
             generation_type: random_preset
             per_scenario: 5
@@ -186,12 +199,14 @@ pipelines:
             positioning:
                 junctions: True
                 streets: False
+            four_wheelers_only: True
         - Actor:
             per_scenario: 5
             tag: other_actor
             positioning:
                 junctions: True
                 streets: False
+            four_wheelers_only: False
         - Weather:
             generation_type: random_preset
             per_scenario: 5
@@ -208,12 +223,14 @@ pipelines:
             positioning:
                 junctions: True
                 streets: False
+            four_wheelers_only: True
         - Actor:
             per_scenario: 5
             tag: other_actor
             positioning:
                 junctions: True
                 streets: False
+            four_wheelers_only: False
         - Weather:
             generation_type: random_preset
             per_scenario: 5

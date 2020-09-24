@@ -59,7 +59,7 @@ The Scenario plugin creates the ``scenario`` tag with the attributes ``name`` an
 ```
 
 ##### Actor
-The Actor plugin can be used for any kind of actor like vehicles or walkers. In the default case, the actor plugin is configured to generate *ego_vehicle* tags with vehicles from the blueprint library. When supplying the ``per_scenario`` attribute, you can multiply the aready created scenarios from the former pipeline steps. It is also possible to supply the ``tag`` name that the plugin writes into the xml, eg. if you would like to use ``other_actor`` as a tag. You can also change the type of actor, that is used for the *model* attribute, by changing the ``type``. To position the actors, you can configure the ``positioning`` for *junctions* and/or *streets*.
+The Actor plugin can be used for any kind of actor like vehicles or walkers. In the default case, the actor plugin is configured to generate *ego_vehicle* tags with vehicles from the blueprint library. When supplying the ``per_scenario`` attribute, you can multiply the aready created scenarios from the former pipeline steps. It is also possible to supply the ``tag`` name that the plugin writes into the xml, eg. if you would like to use ``other_actor`` as a tag. You can also change the type of actor, that is used for the *model* attribute, by changing the ``type``. To position the actors, you can configure the ``positioning`` for *junctions* and/or *streets*. To specify that only four wheelers should be selected as actor models, the attribute ``four_wheelers_only`` can be set to ``True``. If a string is given as the value for the ``model`` attribute, it is always selected as the actor model (``four_wheelers_only`` will be ignored in this case).
 ```yaml
 - Actor:
     per_scenario: 5 # optional, default 1
@@ -68,6 +68,8 @@ The Actor plugin can be used for any kind of actor like vehicles or walkers. In 
     positioning: # optional, default junctions: True, streets: True
         junctions: False
         streets: True
+    four_wheelers_only: True # optional, default: True
+    model: vehicle.tesla.model3 # optional, default null
 ```
 
 ##### Weather
