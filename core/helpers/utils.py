@@ -49,9 +49,14 @@ def get_junction_waypoints(waypoints):
     :returns: A dict containing all junctions in the map and their respective waypoints
     :rtype: dict
     """
+    # Internal blacklist only
+    junctions_blacklist = []
+
     d = defaultdict(lambda: defaultdict(list))
     junction_waypoints = [(waypoint.get_junction().id, waypoint.get_junction(), waypoint)
-                          for waypoint in waypoints if waypoint.is_junction]
+                          for waypoint in waypoints
+                          if waypoint.is_junction and
+                          waypoint.get_junction().id not in junctions_blacklist]
     for k, obj, v in junction_waypoints:
         d[k]["object"] = obj
         d[k]["waypoints_in_junction"].append(v)
