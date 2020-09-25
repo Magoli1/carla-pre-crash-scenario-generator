@@ -50,13 +50,7 @@ class Actor:
             config["positioning"]["junctions"]["relative_to_ego"]["right"] = True
 
         if "streets" not in config["positioning"]:
-            if (config["tag"] != "other_actor" or
-                (not config["positioning"]["junctions"]["straight"] and
-                 not config["positioning"]["junctions"]["left"] and
-                 not config["positioning"]["junctions"]["right"])):
-                config["positioning"]["streets"] = True
-            else:
-                config["positioning"]["streets"] = False
+            config["positioning"]["streets"] = True
 
         if "has_traffic_lights" not in config["positioning"]["junctions"]:
             config["positioning"]["junctions"]["has_traffic_lights"] = True
