@@ -1,7 +1,5 @@
 from xml.etree.ElementTree import SubElement
-
 from core.helpers.utils import extend_scenarios
-
 import random
 
 
@@ -25,15 +23,28 @@ class Actor:
         if config["per_scenario"] <= 0:
             raise Exception("Actor generators optional property 'per_scenario' cannot be <= 0")
         if "positioning" not in config:
-            config["positioning"] = {"junctions": True, "streets": True, "distance_between": 5}
-        pos_config = config["positioning"]
-        if "junctions" not in pos_config:
-            pos_config["junctions"] = True
-        if "streets" not in pos_config:
-            pos_config["streets"] = True
-        if not pos_config["streets"] and not pos_config["junctions"]:
+            config["positioning"] = {"junctions": {"straight": True, "left": True, "right": True},
+                                     "streets": True,
+                                     "distance_between": 5}
+        if "junctions" not in config["positioning"]:
+            config["positioning"]["junctions"] = {"straight": True, "left": True, "right": True,
+                                                  "has_traffic_lights": True}
+        if "straight" not in config["positioning"]["junctions"]:
+            config["positioning"]["junctions"]["straight"] = True
+        if "left" not in config["positioning"]["junctions"]:
+            config["positioning"]["junctions"]["left"] = True
+        if "right" not in config["positioning"]["junctions"]:
+            config["positioning"]["junctions"]["right"] = True
+        if "has_traffic_lights" not in config["positioning"]["junctions"]:
+            config["positioning"]["junctions"]["has_traffic_lights"] = True
+        if "streets" not in config["positioning"]:
+            config["positioning"]["streets"] = True
+        if not config["positioning"]["streets"] and \
+            not config["positioning"]["junctions"]["straight"] and \
+            not config["positioning"]["junctions"]["left"] and \
+            not config["positioning"]["junctions"]["right"]:
             raise Exception(
-                "Actor generators optional properties 'streets' and 'junctions' cannot both be 'False'")
+                "Actor generators optional properties 'streets' and 'junctions.<direction>' cannot all be 'False'")
         self.config = config
         self.data_provider = data_provider
         self.step_idx = step_idx
@@ -52,8 +63,35 @@ class Actor:
         pos_config = self.config["positioning"]
         waypoints_in_town = self.data_provider.get_waypoints_per_map()[town_name]
         allowed_waypoints = []
-        if pos_config["junctions"]:
-            allowed_waypoints += waypoints_in_town["junctions"]
+        if pos_config["junctions"]["has_traffic_lights"] == "Only":
+            junctions_in_town = [junction for junction in waypoints_in_town["junctions"].values()
+                                 if "traffic_lights" in junction]
+        elif not pos_config["junctions"]["has_traffic_lights"]:
+            junctions_in_town = [junction for junction in waypoints_in_town["junctions"].values()
+                                 if "traffic_lights" not in junction]
+        else:
+            junctions_in_town = waypoints_in_town["junctions"].values()
+
+        if len(junctions_in_town) == 0:
+            raise Exception(f"The requested junctions' traffic light configuration could not be "
+                            f"fulfilled for map <{town_name}>! Please exclude it in the "
+                            f"'map_blacklist' for this scenario!")
+
+        if pos_config["junctions"]["straight"]:
+            allowed_waypoints += [waypoints[0] for junction in junctions_in_town
+                                  for waypoints in junction["waypoints_with_straight_turn"]]
+        if pos_config["junctions"]["left"]:
+            allowed_waypoints += [waypoints[0] for junction in junctions_in_town
+                                  for waypoints in junction["waypoints_with_left_turn"]]
+        if pos_config["junctions"]["right"]:
+            allowed_waypoints += [waypoints[0] for junction in junctions_in_town
+                                  for waypoints in junction["waypoints_with_right_turn"]]
+
+        if len(allowed_waypoints) == 0:
+            raise Exception(f"The requested junctions' configuration could not be "
+                            f"fulfilled for map <{town_name}>! Please exclude it in the "
+                            f"'map_blacklist' for this scenario!")
+
         if pos_config["streets"]:
             allowed_waypoints += waypoints_in_town["streets"]
         return allowed_waypoints

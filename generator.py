@@ -13,8 +13,8 @@ import argparse
 def main():
     """Main function that reads the configuration and starts the pipeline(s)
     """
-    generator_config = get_config()
     args = get_args()
+    generator_config = get_config(args.config)
     client = carla.Client(args.host, args.port)
     client.set_timeout(args.timeout)
 
@@ -82,6 +82,11 @@ def get_args():
         default=10.0,
         type=float,
         help='Timeout of the carla client (default: 10.0)')
+    argparser.add_argument(
+        '--config',
+        metavar='C',
+        default='config.yaml',
+        help='Configuration file (default: config.yaml)')
     return argparser.parse_args()
 
 

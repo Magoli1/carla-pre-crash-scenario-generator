@@ -1,5 +1,6 @@
+import carla
 from core.helpers.utils import get_simple_map_name, change_map, get_junction_waypoints, \
-    get_street_waypoints
+    get_street_waypoints, add_traffic_lights_at_junction, add_junction_directions
 
 
 def get_waypoints_for_all_maps(carla_client, distance=5):
@@ -24,6 +25,12 @@ def get_waypoints_for_all_maps(carla_client, distance=5):
         waypoints_per_map[map_name] = dict()
         waypoints_per_map[map_name]["junctions"] = get_junction_waypoints(waypoints)
         waypoints_per_map[map_name]["streets"] = get_street_waypoints(waypoints)
+        waypoints_per_map[map_name]["junctions"] = add_traffic_lights_at_junction(carla_client,
+                                                                                  current_map,
+                                                                                  map_name,
+                                                                                  waypoints_per_map[map_name]["junctions"])
+        waypoints_per_map[map_name]["junctions"] = add_junction_directions(waypoints_per_map[map_name]["junctions"])
+
     return waypoints_per_map
 
 
