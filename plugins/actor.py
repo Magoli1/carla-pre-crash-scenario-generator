@@ -1,6 +1,6 @@
 from xml.etree.ElementTree import SubElement
 
-from core.helpers.utils import extend_scenarios, RoadDirection, get_direction_between_points
+from core.helpers.utils import extend_scenarios, RelativeDirection, get_relative_direction_between_points
 
 import random
 
@@ -130,11 +130,11 @@ class Actor:
 
             allowed_directions = []
             if pos_config["junctions"]["relative_to_ego"]["straight"]:
-                allowed_directions.append(RoadDirection.FRONT)
+                allowed_directions.append(RelativeDirection.OPPOSITE)
             if pos_config["junctions"]["relative_to_ego"]["left"]:
-                allowed_directions.append(RoadDirection.LEFT)
+                allowed_directions.append(RelativeDirection.LEFT)
             if pos_config["junctions"]["relative_to_ego"]["right"]:
-                allowed_directions.append(RoadDirection.RIGHT)
+                allowed_directions.append(RelativeDirection.RIGHT)
 
             possible_waypoints = []
             if pos_config["junctions"]["straight"]:
@@ -148,7 +148,7 @@ class Actor:
                                       in waypoints_in_town["junctions"][junction_id]["waypoints_with_right_turn"]]
 
             for waypoints in possible_waypoints:
-                if get_direction_between_points(
+                if get_relative_direction_between_points(
                         start_point_yaw,
                         waypoints[1].transform.rotation.yaw) in allowed_directions:
                     allowed_waypoints.append((*waypoints, junction_id))

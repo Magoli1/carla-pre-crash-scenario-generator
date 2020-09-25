@@ -12,8 +12,18 @@ class RoadDirection(Enum):
     """
     LEFT = 1
     RIGHT = 2
-    FRONT = 3
-    BACK = 4
+    STRAIGHT = 3
+
+
+class RelativeDirection(Enum):
+    """
+    RelativeDirection represents the relative direction
+    between two points.
+    """
+    SAME = 1
+    OPPOSITE = 2
+    LEFT = 3
+    RIGHT = 4
 
 
 def is_full_qualified_map_name(name):
@@ -206,9 +216,9 @@ def add_junction_directions(junctions_per_map):
 
                 # Compute position of end-waypoint relative to start-waypoint,
                 # to determine the turn's direction
-                direction = get_direction_between_points(start_waypoint.transform.rotation.yaw,
+                direction = get_lane_direction(start_waypoint.transform.rotation.yaw,
                                                          end_waypoint.transform.rotation.yaw)
-                if direction == RoadDirection.FRONT or direction == RoadDirection.BACK:
+                if direction == RoadDirection.STRAIGHT:
                     junctions_per_map[junction_id]["waypoints_with_straight_turn"].append(
                         (waypoint_incoming_road,
                          start_waypoint,
@@ -227,9 +237,9 @@ def add_junction_directions(junctions_per_map):
     return junctions_per_map
 
 
-def get_direction_between_points(yaw_start: float,
-                                 yaw_end: float,
-                                 threshold: int = 35) -> RoadDirection:
+def get_lane_direction(yaw_start: float,
+                       yaw_end: float,
+                       threshold: int = 35) -> RoadDirection:
     """Compute the direction of a lane between a start and an end point
 
     The function calculates the direction of a lane using the yaw values
@@ -247,14 +257,43 @@ def get_direction_between_points(yaw_start: float,
     n = yaw_end % 360.0
     c = yaw_start % 360.0
     diff_angle = (n - c) % 180.0
-    if diff_angle < threshold:
-        return RoadDirection.BACK
-    elif diff_angle > (180 - threshold):
-        return RoadDirection.FRONT
+    if diff_angle < threshold or diff_angle > (180 - threshold):
+        return RoadDirection.STRAIGHT
     elif diff_angle > 90.0:
         return RoadDirection.LEFT
     else:
         return RoadDirection.RIGHT
+
+
+def get_relative_direction_between_points(yaw_first: float,
+                                          yaw_second: float,
+                                          threshold: int = 35) -> RelativeDirection:
+    """Compute the relative direction between two points
+
+    The function calculates the direction of a lane using the yaw values
+    (rotation around the Z axis) of the start and end waypoints.
+
+    :param yaw_start: The rotation around the Z axis of the first point
+    :type yaw_start: float
+    :param yaw_end: The rotation around the Z axis of the secoind point
+    :type yaw_end: float
+    :param threshold: The threshold value for the angle when determining the direction
+    :type threshold: int
+    :returns: Direction of the second point in relation to the first point
+    :rtype: RelativeDirection
+    """
+    n = yaw_first % 360.0
+    c = yaw_second % 360.0
+    diff_angle = (n - c) % 360.0
+    print("Diff angle: " + str(diff_angle))
+    if diff_angle < threshold or diff_angle > (360 - threshold):
+        return RelativeDirection.SAME
+    elif diff_angle > (180 - threshold) and diff_angle < (180 + threshold):
+        return RelativeDirection.OPPOSITE
+    elif diff_angle < 180:
+        return RelativeDirection.LEFT
+    else:
+        return RelativeDirection.RIGHT
 
 
 def change_map(carla_client, map_name, number_tries=10, timeout=2):
