@@ -163,7 +163,7 @@ class Actor:
             else:
                 junctions_in_town = waypoints_in_town["junctions"].values()
 
-            if len(junctions_in_town) == 0:
+            if not pos_config["streets"] and len(junctions_in_town) == 0:
                 raise Exception(f"The requested junctions' traffic light configuration could not be "
                                 f"fulfilled for map <{town_name}>! Please exclude it in the "
                                 f"'map_blacklist' for this scenario!")

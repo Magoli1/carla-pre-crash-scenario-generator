@@ -76,6 +76,10 @@ pipelines:
         - Scenario:
             name_prefix: VehicleTurningRight_generated
             type: VehicleTurningRight
+            map_blacklist:
+              - Town01
+              - Town02
+              - Town06
         - Actor:
             per_scenario: 5
             tag: ego_vehicle
@@ -96,6 +100,9 @@ pipelines:
         - Scenario:
             name_prefix: VehicleTurningLeft_generated
             type: VehicleTurningLeft
+            map_blacklist:
+              - Town01
+              - Town02
         - Actor:
             per_scenario: 5
             tag: ego_vehicle
@@ -156,7 +163,7 @@ pipelines:
                   straight: True
                   left: False
                   right: False
-                  has_traffic_lights: True
+                  has_traffic_lights: Only
                 streets: False
         - Actor:
             per_scenario: 5
@@ -189,7 +196,7 @@ pipelines:
                   straight: False
                   left: True
                   right: False
-                  has_traffic_lights: True
+                  has_traffic_lights: Only
                 streets: False
         - Actor:
             per_scenario: 5
@@ -222,7 +229,7 @@ pipelines:
                   straight: False
                   left: False
                   right: True
-                  has_traffic_lights: True
+                  has_traffic_lights: Only
                 streets: False
         - Actor:
             per_scenario: 5
@@ -247,6 +254,9 @@ pipelines:
         - Scenario:
             name_prefix: NoSignalJunctionCrossing_generated
             type: NoSignalJunctionCrossing
+            map_blacklist:
+              - Town01
+              - Town02
         - Actor:
             per_scenario: 5
             tag: ego_vehicle
