@@ -285,15 +285,14 @@ def get_relative_direction_between_points(yaw_first: float,
     n = yaw_first % 360.0
     c = yaw_second % 360.0
     diff_angle = (n - c) % 360.0
-    print("Diff angle: " + str(diff_angle))
     if diff_angle < threshold or diff_angle > (360 - threshold):
         return RelativeDirection.SAME
     elif diff_angle > (180 - threshold) and diff_angle < (180 + threshold):
         return RelativeDirection.OPPOSITE
     elif diff_angle < 180:
-        return RelativeDirection.LEFT
-    else:
         return RelativeDirection.RIGHT
+    else:
+        return RelativeDirection.LEFT
 
 
 def change_map(carla_client, map_name, number_tries=10, timeout=2):
