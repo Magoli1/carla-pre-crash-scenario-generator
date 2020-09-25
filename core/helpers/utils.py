@@ -58,12 +58,17 @@ def get_junction_waypoints(waypoints):
 
     :param waypoints: A list of unfiltered waypoints
     :type waypoints: list
-    :returns: Waypoints that lay on a junction
-    :rtype: list
+    :returns: A dict containing all junctions in the map and their respective waypoints
+    :rtype: dict
     """
+    # Internal blacklist only
+    junctions_blacklist = []
+
     d = defaultdict(lambda: defaultdict(list))
     junction_waypoints = [(waypoint.get_junction().id, waypoint.get_junction(), waypoint)
-                          for waypoint in waypoints if waypoint.is_junction]
+                          for waypoint in waypoints
+                          if waypoint.is_junction and
+                          waypoint.get_junction().id not in junctions_blacklist]
     for k, obj, v in junction_waypoints:
         d[k]["object"] = obj
         d[k]["waypoints_in_junction"].append(v)
@@ -100,7 +105,21 @@ def get_street_waypoints(waypoints, min_dist_before_junction=80, min_dist_after_
     return valid_waypoints
 
 
-def get_traffic_lights_at_junction(carla_client, current_map, map_name, junctions_per_map):
+def add_traffic_lights_at_junction(carla_client, current_map, map_name, junctions_per_map):
+    """Extends the junctions dict by adding the information for the traffic lights at the
+    respective junctions
+
+    :param carla_client: Carla client reference
+    :type carla_client: object
+    :param current_map: Currently loaded map
+    :type current_map: object
+    :param map_name: Name of the currently loaded map
+    :type map_name: String
+    :param junctions_per_map: A dict containing all the junctions in the currently loaded map
+    :type junctions_per_map: dict
+    :returns: Extended junctions dict
+    :rtype: dict
+    """
     for tl in carla_client.get_world().get_actors().filter('traffic.traffic_light*'):
         point = current_map.get_waypoint(tl.get_location(), project_to_road=True,
                                          lane_type=carla.LaneType.Driving)
@@ -144,7 +163,15 @@ def get_traffic_lights_at_junction(carla_client, current_map, map_name, junction
     return junctions_per_map
 
 
-def get_junction_directions(junctions_per_map):
+def add_junction_directions(junctions_per_map):
+    """ Extends the junctions dict by adding to each junction the information for the turns allowed
+    at each lane and their respective direction
+
+    :param junctions_per_map: A dict containing all the junctions in the currently loaded map
+    :type junctions_per_map: dict
+    :returns: Extended junctions dict
+    :rtype: dict
+    """
     for junction_id, junction in junctions_per_map.items():
         junction_waypoints = junction["object"].get_waypoints(carla.LaneType.Driving)
         already_seen_waypoints = []

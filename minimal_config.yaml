@@ -1,4 +1,4 @@
-dataprovider: # optional, preload: False
+dataprovider:
   preload: True
 pipelines:
   - MinimalExample:
@@ -6,6 +6,10 @@ pipelines:
         - Scenario:
             name_prefix: MinimalExample
             type: MinimalExample
+            map_blacklist:
+              - Town01
+              - Town02
+              - Town06
         - Actor:
             per_scenario: 5
             tag: ego_vehicle
@@ -14,6 +18,7 @@ pipelines:
                 straight: False
                 left: False
                 right: True
+                has_traffic_lights: False # <True|False|Only>
               streets: False
         - Actor:
             per_scenario: 5
@@ -23,6 +28,7 @@ pipelines:
                 straight: False
                 left: False
                 right: True
+                has_traffic_lights: False
                 relative_to_ego:
                   straight: False
                   left: True
