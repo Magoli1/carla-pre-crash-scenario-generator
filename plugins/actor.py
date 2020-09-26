@@ -47,7 +47,7 @@ class Actor:
             raise Exception(
                 "Actor generators optional properties 'streets' and 'junctions.<direction>' cannot all be 'False'")
 
-        if "colors" not in config["colors"] or not config["colors"] or not isinstance(config["colors"], list):
+        if "colors" not in config or not config["colors"] or not isinstance(config["colors"], list):
             config["colors"] = get_color_names()
         else:
             unsupported_colors = compare_color_lists(config["colors"])
@@ -119,4 +119,4 @@ class Actor:
             actor.set("model", kwargs["actor_model"])
 
         if "actor_color" in kwargs:
-            actor.set("color", "{}, {}, {}".format(*get_color_by_name(kwargs["actor_model"])))
+            actor.set("color", "{}, {}, {}".format(*get_color_by_name(kwargs["actor_color"])))
