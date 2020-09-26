@@ -59,7 +59,7 @@ The Scenario plugin creates the ``scenario`` tag with the attributes ``name`` an
 ```
 
 ##### Actor
-The Actor plugin can be used for any kind of actor like vehicles or walkers. In the default case, the actor plugin is configured to generate *ego_vehicle* tags with vehicles from the blueprint library. When supplying the ``per_scenario`` attribute, you can multiply the aready created scenarios from the former pipeline steps. It is also possible to supply the ``tag`` name that the plugin writes into the xml, eg. if you would like to use ``other_actor`` as a tag. You can also change the type of actor, that is used for the *model* attribute, by changing the ``type``. To position the actors, you can configure the ``positioning`` for *junctions* and/or *streets*.
+The Actor plugin can be used for any kind of actor like vehicles or walkers. In the default case, the actor plugin is configured to generate *ego_vehicle* tags with vehicles from the blueprint library. When supplying the ``per_scenario`` attribute, you can multiply the aready created scenarios from the former pipeline steps. It is also possible to supply the ``tag`` name that the plugin writes into the xml, eg. if you would like to use ``other_actor`` as a tag. You can also change the type of actor, that is used for the *model* attribute, by changing the ``type``. To position the actors, you can configure the ``positioning`` for *junctions* and/or *streets*. Optionally ``colors`` can be defined, which can be selected for the actor. A list of the available colors can be found below. If ``colors`` is not defined, all of the colors are possible to be selected.
 ```yaml
 - Actor:
     per_scenario: 5 # optional, default 1
@@ -68,7 +68,31 @@ The Actor plugin can be used for any kind of actor like vehicles or walkers. In 
     positioning: # optional, default junctions: True, streets: True
         junctions: False
         streets: True
+    colors: # optional, default: all available colors
+        - Black
+        - White
+        - Silver
+        - Red
+        - Blue
 ```
+
+*Available Colors:*
+- ![Black](https://via.placeholder.com/15/000000/000000?text=+) `Black`
+- ![Maroon](https://via.placeholder.com/15/800000/000000?text=+) `Maroon`
+- ![Green](https://via.placeholder.com/15/008000/000000?text=+) `Green`
+- ![Olive](https://via.placeholder.com/15/808000/000000?text=+) `Olive`
+- ![Navy](https://via.placeholder.com/15/000080/000000?text=+) `Navy`
+- ![Purple](https://via.placeholder.com/15/800080/000000?text=+) `Purple`
+- ![Teal](https://via.placeholder.com/15/008080/000000?text=+) `Teal`
+- ![Silver](https://via.placeholder.com/15/c0c0c0/000000?text=+) `Silver`
+- ![Grey](https://via.placeholder.com/15/808080/000000?text=+) `Grey`
+- ![Red](https://via.placeholder.com/15/ff0000/000000?text=+) `Red`
+- ![Lime](https://via.placeholder.com/15/00ff00/000000?text=+) `Lime`
+- ![Yellow](https://via.placeholder.com/15/ffff00/000000?text=+) `Yellow`
+- ![Blue](https://via.placeholder.com/15/0000ff/000000?text=+) `Blue`
+- ![Fuchsia](https://via.placeholder.com/15/ff00ff/000000?text=+) `Fuchsia`
+- ![Aqua](https://via.placeholder.com/15/00ffff/000000?text=+) `Aqua`
+- ![White](https://via.placeholder.com/15/ffffff/000000?text=+) `White`
 
 ##### Weather
 The weather plugin generates for every scenario inside the XML-tree the ``weather`` tag. You can optionally specifiy the ``per_Scenario`` property, which is defaulted to 1. By giving it a higher number, you multiply the already existing entries inside the XML by this number. This makes it possible to have the same scenario several times, each time, with different weather behaviors. By specifying the optional property ``generation_type``, you can change the behavior of generated weather scenarios. Possible values are *random_preset* and *random*. The default is *random_preset*. In case of that value, the already available presets from carla are used for the weather scenarios. When you specify *random*, each variable of the weather attribute will be randomly selected on its own. The provided example will result in 4 copies of the input scenarios, so that there are 5 scenarios.

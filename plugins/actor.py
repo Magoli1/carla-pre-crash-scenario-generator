@@ -1,4 +1,5 @@
 from xml.etree.ElementTree import SubElement
+from core.helpers.colors import get_color_names, compare_color_lists, get_color_by_name
 from core.helpers.utils import extend_scenarios
 import random
 
@@ -45,6 +46,16 @@ class Actor:
             not config["positioning"]["junctions"]["right"]:
             raise Exception(
                 "Actor generators optional properties 'streets' and 'junctions.<direction>' cannot all be 'False'")
+
+        if "colors" not in config["colors"] or not config["colors"] or not isinstance(config["colors"], list):
+            config["colors"] = get_color_names()
+        else:
+            unsupported_colors = compare_color_lists(config["colors"])
+            if unsupported_colors:
+                raise Exception(
+                    "The following colors are not available: {}. "
+                    "The available colors are: {}".format(unsupported_colors, get_color_names()))
+
         self.config = config
         self.data_provider = data_provider
         self.step_idx = step_idx
@@ -57,6 +68,7 @@ class Actor:
             attributes["waypoint"] = random.choice(
                 self.get_allowed_waypoints_in_town(scenario.get("town")))
             attributes["actor_model"] = random.choice(self.actor_models)
+            attributes["actor_color"] = random.choice(self.config["colors"])
             self.decorate_actor(actor, **attributes)
 
     def get_allowed_waypoints_in_town(self, town_name):
@@ -105,4 +117,6 @@ class Actor:
 
         if "actor_model" in kwargs:
             actor.set("model", kwargs["actor_model"])
-        pass
+
+        if "actor_color" in kwargs:
+            actor.set("color", "{}, {}, {}".format(*get_color_by_name(kwargs["actor_model"])))
