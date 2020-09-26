@@ -2,7 +2,7 @@
 
 ScenarioRunner for CARLA
 ========================
-This folder contains a modified copy of version **0.9.9** of the [ScenarioRunner for Carla](https://github.com/carla-simulator/scenario_runner). This version of the ScenarioRunner only contains scenarios which are relevant for the [Carla Challenge](https://carlachallenge.org/challenge/nhtsa/).
+This folder contains a modified copy of version **0.9.9** of the [ScenarioRunner for Carla](https://github.com/carla-simulator/scenario_runner). This version of the ScenarioRunner only contains files and methods which are needed for running the [Carla Challenge](https://carlachallenge.org/challenge/nhtsa/).
 
 Using the ScenarioRunner
 ------------------------

@@ -81,27 +81,3 @@ A list of supported scenarios is provided in
 [List of Supported Scenarios](list_of_scenarios.md). Please note that
 different scenarios may take place in different CARLA towns. This has to be
 respected when launching the CARLA server.
-
-## Running scenarios using the OpenSCENARIO format
-To run a scenario, which is based on the OpenSCENARIO format, please run the ScenarioRunner as follows:
-```
-python scenario_runner.py --openscenario <path/to/xosc-file>
-```
-Please note that the OpenSCENARIO support and the OpenSCENARIO format itself are still work in progress.
-More information you can find in [OpenSCENARIO support](openscenario_support.md)
-
-## Running route-based scenario (similar to the CARLA AD Challenge)
-To run a route-based scenario, please run the ScenarioRunner as follows:
-```
-python scenario_runner.py --route <path/to/route-file> <path/to/scenario_sample_file> [route id] --agent <path/to/agent_file>
-```
-Example:
-```
-python scenario_runner.py /scenario_runner/srunner/routes_debug.xml /scenario_runner/srunner/data/all_towns_traffic_scenarios1_3_4.json 0 --agent srunner/autoagents/npc_agent.py
-```
-
-If no route id is provided, all routes within the given file will be executed.
-
-
-By doing so, ScenarioRunner will match the scenarios to the route, and they'll activate when the ego vehicle is nearby. However, routes need an autonomous agent to control the ego vehicle. Several examples are provided in srunner/autoagents/. For more information about agents, please have a look into the [agent documentation](agent_evaluation.md)
-

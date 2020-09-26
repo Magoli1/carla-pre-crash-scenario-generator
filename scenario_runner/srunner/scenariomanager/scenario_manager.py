@@ -16,7 +16,6 @@ import time
 
 import py_trees
 
-from srunner.autoagents.agent_wrapper import AgentWrapper
 from srunner.scenariomanager.carla_data_provider import CarlaDataProvider, CarlaActorPool
 from srunner.scenariomanager.result_writer import ResultOutputProvider
 from srunner.scenariomanager.timer import GameTime, TimeOut
@@ -179,7 +178,7 @@ class ScenarioManager(object):
         Load a new scenario
         """
         self._reset()
-        self._agent = AgentWrapper(agent) if agent else None
+        self._agent = None
         self.scenario_class = scenario
         self.scenario = scenario.scenario
         self.scenario_tree = self.scenario.scenario_tree

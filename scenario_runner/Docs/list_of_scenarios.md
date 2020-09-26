@@ -31,11 +31,6 @@ approaching ego vehicle has to handle this situation correctly, i.e. despite of
 a green traffic light, it has to stop and wait until the intersection is clear
 again. Afterwards, it should continue driving.
 
-### StationaryObjectCrossing
-In this scenario a cyclist is stationary waiting in the middle of the road and
-blocking the way for the ego vehicle. Hence, the ego vehicle has to stop in
-front of the cyclist.
-
 ### DynamicObjectCrossing
 This is similar to 'StationaryObjectCrossing', but with the difference that the
 cyclist is dynamic. It suddenly drives into the way of the ego vehicle, which
