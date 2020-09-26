@@ -20,6 +20,7 @@ pipelines:
                     right: True
                     has_traffic_lights: False  # <True|False|Only>
                 streets: False
+              four_wheelers_only: True
         - Weather:
             generation_type: random_preset
             per_scenario: 5
