@@ -489,7 +489,7 @@ class CarlaActorPool(object):
                         color, blueprint.id))
             else:
                 default_color_rgba = blueprint.get_attribute('color').as_color()
-                default_color = '({}, {}, {})'.format(default_color_rgba.r, default_color_rgba.g, default_color_rgba.b)
+                default_color = '{}, {}, {}'.format(default_color_rgba.r, default_color_rgba.g, default_color_rgba.b)
                 try:
                     blueprint.set_attribute('color', color)
                 except ValueError:
