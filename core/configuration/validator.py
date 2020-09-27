@@ -115,5 +115,7 @@ def check_steps_config_valid(idx, steps_config):
     is_subset = set(pipeline_step_names).issubset(class_names)
     if not is_subset:
         logger.error(
-            f'Config error at pipeline #{idx}: One or more of the configured steps do not correspond to a valid class name. Value needs to be in {class_names}')
+            f'Config error at pipeline #{idx}: '
+            f'One or more of the configured steps do not correspond to a valid class name.'
+            f' Value needs to be in {class_names}')
         raise SystemExit(0)

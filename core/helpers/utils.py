@@ -25,6 +25,7 @@ class RelativeDirection(Enum):
     LEFT = 3
     RIGHT = 4
 
+
 from core.logger.logger import logger
 from tqdm import tqdm
 
@@ -197,7 +198,8 @@ def add_junction_directions(junctions_per_map):
                         waypoint = waypoint.previous(0.5)[0]
                 start_waypoint = waypoint
 
-                # Check if start-waypoint is part of an already tracked connecting road (road + lane)
+                # Check if start-waypoint is part of an
+                # already tracked connecting road (road + lane)
                 if [start_waypoint.road_id, start_waypoint.lane_id] in already_seen_waypoints:
                     continue
                 else:
@@ -220,7 +222,7 @@ def add_junction_directions(junctions_per_map):
                 # Compute position of end-waypoint relative to start-waypoint,
                 # to determine the turn's direction
                 direction = get_lane_direction(start_waypoint.transform.rotation.yaw,
-                                                         end_waypoint.transform.rotation.yaw)
+                                               end_waypoint.transform.rotation.yaw)
                 if direction == RoadDirection.STRAIGHT:
                     junctions_per_map[junction_id]["waypoints_with_straight_turn"].append(
                         (waypoint_incoming_road,

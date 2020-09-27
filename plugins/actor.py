@@ -76,7 +76,8 @@ class Actor:
             not config["positioning"]["junctions"]["left"] and \
             not config["positioning"]["junctions"]["right"]:
             self.logger.error(
-                "Actor generators optional properties 'streets' and 'junctions.<direction>' cannot all be 'False'")
+                "Actor generators optional properties 'streets' and 'junctions.<direction>'"
+                " cannot all be 'False'")
             raise SystemExit(0)
 
         if (config["tag"] == "other_actor"

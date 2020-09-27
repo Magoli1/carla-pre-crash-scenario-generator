@@ -48,5 +48,6 @@ def check_implemented_functions(_class):
         # check if the method is expecting the mandatory number of arguments
         if not len(inspect.getfullargspec(ref_function).args) == number_function_mandatory_params:
             logger.error(
-                f"Method {function_name} implemented in class {_class.__name__} is not expecting {number_function_mandatory_params} passed arguments")
+                f"Method {function_name} implemented in class {_class.__name__} "
+                f"is not expecting {number_function_mandatory_params} passed arguments")
             raise SystemExit(0)

@@ -24,7 +24,8 @@ class Scenario:
             is_subset = set(config["map_blacklist"]).issubset(all_maps)
             if not is_subset:
                 self.logger.error(
-                    f'Scenario generator property "map_blacklist" has one value which is not in {all_maps}')
+                    f'Scenario generator property "map_blacklist" '
+                    f'has one value which is not in {all_maps}')
                 raise SystemExit(0)
         else:
             config["map_blacklist"] = []
