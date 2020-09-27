@@ -1,6 +1,7 @@
 from xml.etree.ElementTree import SubElement
 
-from core.helpers.utils import extend_scenarios, RelativeDirection, get_relative_direction_between_points
+from core.helpers.utils import extend_scenarios, RelativeDirection, \
+    get_relative_direction_between_points
 
 import random
 
@@ -18,7 +19,8 @@ class Actor:
             config["four_wheelers_only"] = True
         if config["four_wheelers_only"]:
             for actor in available_actors:
-                if actor.has_attribute('number_of_wheels') and actor.get_attribute('number_of_wheels').as_int() == 4:
+                if actor.has_attribute('number_of_wheels') and actor.get_attribute(
+                    'number_of_wheels').as_int() == 4:
                     self.actor_models.append(actor.id)
         else:
             self.actor_models = [actor.id for actor in available_actors]
@@ -84,7 +86,7 @@ class Actor:
                  not config["positioning"]["junctions"]["left"] and
                  not config["positioning"]["junctions"]["right"])):
             self.logger.error(
-                                "Actor generators optional properties of 'relative_to_ego' "
+                "Actor generators optional properties of 'relative_to_ego' "
                 "cannot be 'True' if all directions in 'junctions' are 'False'")
             raise SystemExit(0)
 
@@ -99,7 +101,8 @@ class Actor:
             attributes = {}
             if self.config["tag"] == "other_actor":
                 relative_to_ego = not all(switch is False for switch in
-                                          self.config["positioning"]["junctions"]["relative_to_ego"].values())
+                                          self.config["positioning"]["junctions"][
+                                              "relative_to_ego"].values())
                 ego_vehicle = scenario.find("ego_vehicle")
                 junction_id = None
                 start_point_yaw = None
@@ -139,7 +142,8 @@ class Actor:
         if relative_to_ego:
             if not junction_id or not start_point_yaw:
                 if pos_config["streets"]:
-                    return [(waypoint, None, None, None) for waypoint in waypoints_in_town["streets"]]
+                    return [(waypoint, None, None, None) for waypoint in
+                            waypoints_in_town["streets"]]
                 else:
                     return []
 
@@ -154,50 +158,59 @@ class Actor:
             possible_waypoints = []
             if pos_config["junctions"]["straight"]:
                 possible_waypoints += [(*waypoints, junction_id) for waypoints
-                                      in waypoints_in_town["junctions"][junction_id]["waypoints_with_straight_turn"]]
+                                       in waypoints_in_town["junctions"][junction_id][
+                                           "waypoints_with_straight_turn"]]
             if pos_config["junctions"]["left"]:
                 possible_waypoints += [(*waypoints, junction_id) for waypoints
-                                      in waypoints_in_town["junctions"][junction_id]["waypoints_with_left_turn"]]
+                                       in waypoints_in_town["junctions"][junction_id][
+                                           "waypoints_with_left_turn"]]
             if pos_config["junctions"]["right"]:
                 possible_waypoints += [(*waypoints, junction_id) for waypoints
-                                      in waypoints_in_town["junctions"][junction_id]["waypoints_with_right_turn"]]
+                                       in waypoints_in_town["junctions"][junction_id][
+                                           "waypoints_with_right_turn"]]
 
             for waypoints in possible_waypoints:
                 if get_relative_direction_between_points(
-                        start_point_yaw,
-                        waypoints[1].transform.rotation.yaw) in allowed_directions:
+                    start_point_yaw,
+                    waypoints[1].transform.rotation.yaw) in allowed_directions:
                     allowed_waypoints.append((*waypoints, junction_id))
 
         else:
             if pos_config["junctions"]["has_traffic_lights"] == "Only":
-                junctions_in_town = [junction for junction in waypoints_in_town["junctions"].values()
-                                    if "traffic_lights" in junction]
+                junctions_in_town = [junction for junction in
+                                     waypoints_in_town["junctions"].values()
+                                     if "traffic_lights" in junction]
             elif not pos_config["junctions"]["has_traffic_lights"]:
-                junctions_in_town = [junction for junction in waypoints_in_town["junctions"].values()
-                                    if "traffic_lights" not in junction]
+                junctions_in_town = [junction for junction in
+                                     waypoints_in_town["junctions"].values()
+                                     if "traffic_lights" not in junction]
             else:
                 junctions_in_town = waypoints_in_town["junctions"].values()
 
             if not pos_config["streets"] and len(junctions_in_town) == 0:
-                self.logger.error(f"The requested junctions' traffic light configuration could not be "
-                                f"fulfilled for map <{town_name}>! Please exclude it in the "
-                                f"'map_blacklist' for this scenario!")
+                self.logger.error(
+                    f"The requested junctions' traffic light configuration could not be "
+                    f"fulfilled for map <{town_name}>! Please exclude it in the "
+                    f"'map_blacklist' for this scenario!")
                 raise SystemExit(0)
 
             if pos_config["junctions"]["straight"]:
-                allowed_waypoints += [(*waypoints, junction["object"].id) for junction in junctions_in_town
-                                    for waypoints in junction["waypoints_with_straight_turn"]]
+                allowed_waypoints += [(*waypoints, junction["object"].id) for junction in
+                                      junctions_in_town
+                                      for waypoints in junction["waypoints_with_straight_turn"]]
             if pos_config["junctions"]["left"]:
-                allowed_waypoints += [(*waypoints, junction["object"].id) for junction in junctions_in_town
-                                    for waypoints in junction["waypoints_with_left_turn"]]
+                allowed_waypoints += [(*waypoints, junction["object"].id) for junction in
+                                      junctions_in_town
+                                      for waypoints in junction["waypoints_with_left_turn"]]
             if pos_config["junctions"]["right"]:
-                allowed_waypoints += [(*waypoints, junction["object"].id) for junction in junctions_in_town
-                                    for waypoints in junction["waypoints_with_right_turn"]]
+                allowed_waypoints += [(*waypoints, junction["object"].id) for junction in
+                                      junctions_in_town
+                                      for waypoints in junction["waypoints_with_right_turn"]]
 
             if not pos_config["streets"] and len(allowed_waypoints) == 0:
                 self.logger.error(f"The requested junctions' configuration could not be "
-                                f"fulfilled for map <{town_name}>! Please exclude it in the "
-                                f"'map_blacklist' for this scenario!")
+                                  f"fulfilled for map <{town_name}>! Please exclude it in the "
+                                  f"'map_blacklist' for this scenario!")
                 raise SystemExit(0)
 
             if pos_config["streets"]:
