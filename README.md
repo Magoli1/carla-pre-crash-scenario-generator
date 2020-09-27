@@ -96,8 +96,9 @@ To make the generator easily extensible, you are able to write plugins, that are
     * The configuration for your pipeline step
     * The data_provider object, which you can use to access cached data entities (more [here](#data-provider))
     * The index of the step that this plugin is running (*Note: For every step inside the pipelines a new object will get created for the plugin, even if it is multiple times inside*)
+    * The custom logger instance (see more [here](#logging))
     ```python
-    def __init__(self, carla_client, config, data_provider, step_idx):
+    def __init__(self, carla_client, config, data_provider, step_idx, logger):
         pass
     ```
 4. Implement the *generate* method (see below). You dont need to return anything as the xml-tree works with pointers for faster processing. You will get passed the following data:
@@ -120,6 +121,10 @@ To make regular tasks easy, we provide the following helper methods that can be 
 2. *change_map*: As the name suggests, this lets you change the map of the carla simulator. In comparison to the native carla method for changing maps, this method gives you the ability to specify the timeout for loading new maps. It is also defaulted in such a way that also "slow" computers will work with it.
 3. *is_full_qualified_map_name*: Checks whether the provided map name is in the fully qualified format or not.
 4. *get_simple_map_name*: Given a fully qualified name, it will give you the simple name of a map, which is the last part of the fully qualified name.
+
+### Logging
+A custom logging instance is passed to the constructor of every plugin. It can be used to log any output to stdout. This also applies to errors, which can be logged with ``logger.error``. They will be marked red inside of the console for better visibility. It is on you to break the execution with ``raise SystemExit(0)`` or to just give the information and let the pipeline run further.
+
 
 ## Scenarios
 The [carla challenge](https://carlachallenge.org/) provides [10 of the most occuring pre-crash scenarios](https://carlachallenge.org/challenge/nhtsa/) as illustrations. As the scenario-runner documentation lacks a proper mapping of these scenarios to the example scenarios, a mapping can be found in the [scenarioMapping](scenarioMapping.txt) as a key-value-pairing.
