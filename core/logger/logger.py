@@ -1,10 +1,11 @@
 import logging
 from core.logger.log_formatter import CustomFormatter
 
-logger = logging.getLogger("CPCSG")
+logger = logging.getLogger("CPCSG")  # Carla Pre Crash Scenario Generator
+logger.setLevel(logging.INFO)
 
 ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
+ch.setLevel(logging.INFO)
 
 ch.setFormatter(CustomFormatter())
 
@@ -18,6 +19,7 @@ def set_logging_level(level=logging.INFO):
     :type level: str
     """
     logger.setLevel(level)
+    ch.setLevel(level)
 
 
 def get_plugin_logger(plugin_name, level=logging.INFO):
@@ -31,11 +33,7 @@ def get_plugin_logger(plugin_name, level=logging.INFO):
     :rtype: object
     """
     plugin_logger = logging.getLogger(plugin_name)
+    plugin_logger.setLevel(level)
 
-    channel = logging.StreamHandler()
-    channel.setLevel(level)
-
-    channel.setFormatter(CustomFormatter())
-
-    plugin_logger.addHandler(channel)
+    plugin_logger.addHandler(ch)
     return plugin_logger
