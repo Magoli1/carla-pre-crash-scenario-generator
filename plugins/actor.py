@@ -1,13 +1,16 @@
 import random
 from xml.etree.ElementTree import SubElement
 
-from core.helpers.colors import get_color_names, compare_color_lists, get_color_by_name
-from core.helpers.utils import extend_scenarios, RelativeDirection, get_relative_direction_between_points
+from core.helpers.colors import get_color_names, compare_color_lists, \
+    get_color_by_name
+from core.helpers.utils import extend_scenarios, RelativeDirection, \
+    get_relative_direction_between_points
 
 
 class Actor:
-    def __init__(self, carla_client, config, data_provider, step_idx):
+    def __init__(self, carla_client, config, data_provider, step_idx, logger):
         self.client = carla_client
+        self.logger = logger
         if "type" not in config:
             config["type"] = "vehicle"
         self.actor_models = []
@@ -17,24 +20,29 @@ class Actor:
             config["four_wheelers_only"] = True
         if config["four_wheelers_only"]:
             for actor in available_actors:
-                if actor.has_attribute('number_of_wheels') and actor.get_attribute('number_of_wheels').as_int() == 4:
+                if actor.has_attribute('number_of_wheels') and actor.get_attribute(
+                    'number_of_wheels').as_int() == 4:
                     self.actor_models.append(actor.id)
         else:
             self.actor_models = [actor.id for actor in available_actors]
         if not self.actor_models:
             if not available_actors:
-                raise Exception(f"No vehicles for type {config['type']} found")
+                self.logger.error(f"No vehicles for type {config['type']} found")
+                raise SystemExit(0)
             else:
-                raise Exception(f"No four wheelers for type {config['type']} found")
+                self.logger.error(f"No four wheelers for type {config['type']} found")
+                raise SystemExit(0)
         if "tag" not in config:
             config["tag"] = "ego_vehicle"
         if config["tag"] not in ["ego_vehicle", "other_actor"]:
-            raise Exception(
+            self.logger.error(
                 "Actor generators optional property 'tag' must be in ['ego_vehicle', 'other_actor']")
+            raise SystemExit(0)
         if "per_scenario" not in config:
             config["per_scenario"] = 1
         if config["per_scenario"] <= 0:
-            raise Exception("Actor generators optional property 'per_scenario' cannot be <= 0")
+            self.logger.error("Actor generators optional property 'per_scenario' cannot be <= 0")
+            raise SystemExit(0)
         if "positioning" not in config:
             config["positioning"] = {"junctions": {"straight": True, "left": True, "right": True},
                                      "streets": True,
@@ -70,8 +78,10 @@ class Actor:
             not config["positioning"]["junctions"]["straight"] and \
             not config["positioning"]["junctions"]["left"] and \
             not config["positioning"]["junctions"]["right"]:
-            raise Exception(
-                "Actor generators optional properties 'streets' and 'junctions.<direction>' cannot all be 'False'")
+            self.logger.error(
+                "Actor generators optional properties 'streets' and 'junctions.<direction>'"
+                " cannot all be 'False'")
+            raise SystemExit(0)
 
         if (config["tag"] == "other_actor"
             and not all(switch is False for switch
@@ -79,19 +89,20 @@ class Actor:
             and (not config["positioning"]["junctions"]["straight"] and
                  not config["positioning"]["junctions"]["left"] and
                  not config["positioning"]["junctions"]["right"])):
-            raise Exception(
+            self.logger.error(
                 "Actor generators optional properties of 'relative_to_ego' "
-                "cannot be 'True' if all directions in 'junctions' are 'False'"
-            )
+                "cannot be 'True' if all directions in 'junctions' are 'False'")
+            raise SystemExit(0)
 
         if "colors" not in config or not config["colors"] or not isinstance(config["colors"], list):
             config["colors"] = get_color_names()
         else:
             unsupported_colors = compare_color_lists(config["colors"])
             if unsupported_colors:
-                raise Exception(
+                self.logger.error(
                     "The following colors are not available: {}. "
                     "The available colors are: {}".format(unsupported_colors, get_color_names()))
+                raise SystemExit(0)
 
         self.config = config
         self.data_provider = data_provider
@@ -104,7 +115,8 @@ class Actor:
             attributes = {}
             if self.config["tag"] == "other_actor":
                 relative_to_ego = not all(switch is False for switch in
-                                          self.config["positioning"]["junctions"]["relative_to_ego"].values())
+                                          self.config["positioning"]["junctions"][
+                                              "relative_to_ego"].values())
                 ego_vehicle = scenario.find("ego_vehicle")
                 junction_id = None
                 start_point_yaw = None
@@ -123,8 +135,8 @@ class Actor:
                 allowed_waypoints = self.get_allowed_waypoints_in_town(scenario.get("town"))
             if not allowed_waypoints:
                 tree.getroot().remove(scenario)
-                print(f"One Scenario was removed, because there is no "
-                      f"allowed waypoint for {self.config['tag']}")
+                self.logger.debug(f"One Scenario was removed, because there is no "
+                                  f"allowed waypoint for {self.config['tag']}")
                 continue
             waypoint = random.choice(allowed_waypoints)
             attributes["waypoint"] = waypoint[0]
@@ -145,7 +157,8 @@ class Actor:
         if relative_to_ego:
             if not junction_id or not start_point_yaw:
                 if pos_config["streets"]:
-                    return [(waypoint, None, None, None) for waypoint in waypoints_in_town["streets"]]
+                    return [(waypoint, None, None, None) for waypoint in
+                            waypoints_in_town["streets"]]
                 else:
                     return []
 
@@ -160,49 +173,60 @@ class Actor:
             possible_waypoints = []
             if pos_config["junctions"]["straight"]:
                 possible_waypoints += [(*waypoints, junction_id) for waypoints
-                                      in waypoints_in_town["junctions"][junction_id]["waypoints_with_straight_turn"]]
+                                       in waypoints_in_town["junctions"][junction_id][
+                                           "waypoints_with_straight_turn"]]
             if pos_config["junctions"]["left"]:
                 possible_waypoints += [(*waypoints, junction_id) for waypoints
-                                      in waypoints_in_town["junctions"][junction_id]["waypoints_with_left_turn"]]
+                                       in waypoints_in_town["junctions"][junction_id][
+                                           "waypoints_with_left_turn"]]
             if pos_config["junctions"]["right"]:
                 possible_waypoints += [(*waypoints, junction_id) for waypoints
-                                      in waypoints_in_town["junctions"][junction_id]["waypoints_with_right_turn"]]
+                                       in waypoints_in_town["junctions"][junction_id][
+                                           "waypoints_with_right_turn"]]
 
             for waypoints in possible_waypoints:
                 if get_relative_direction_between_points(
-                        start_point_yaw,
-                        waypoints[1].transform.rotation.yaw) in allowed_directions:
+                    start_point_yaw,
+                    waypoints[1].transform.rotation.yaw) in allowed_directions:
                     allowed_waypoints.append((*waypoints, junction_id))
 
         else:
             if pos_config["junctions"]["has_traffic_lights"] == "Only":
-                junctions_in_town = [junction for junction in waypoints_in_town["junctions"].values()
-                                    if "traffic_lights" in junction]
+                junctions_in_town = [junction for junction in
+                                     waypoints_in_town["junctions"].values()
+                                     if "traffic_lights" in junction]
             elif not pos_config["junctions"]["has_traffic_lights"]:
-                junctions_in_town = [junction for junction in waypoints_in_town["junctions"].values()
-                                    if "traffic_lights" not in junction]
+                junctions_in_town = [junction for junction in
+                                     waypoints_in_town["junctions"].values()
+                                     if "traffic_lights" not in junction]
             else:
                 junctions_in_town = waypoints_in_town["junctions"].values()
 
             if not pos_config["streets"] and len(junctions_in_town) == 0:
-                raise Exception(f"The requested junctions' traffic light configuration could not be "
-                                f"fulfilled for map <{town_name}>! Please exclude it in the "
-                                f"'map_blacklist' for this scenario!")
+                self.logger.error(
+                    f"The requested junctions' traffic light configuration could not be "
+                    f"fulfilled for map <{town_name}>! Please exclude it in the "
+                    f"'map_blacklist' for this scenario!")
+                raise SystemExit(0)
 
             if pos_config["junctions"]["straight"]:
-                allowed_waypoints += [(*waypoints, junction["object"].id) for junction in junctions_in_town
-                                    for waypoints in junction["waypoints_with_straight_turn"]]
+                allowed_waypoints += [(*waypoints, junction["object"].id) for junction in
+                                      junctions_in_town
+                                      for waypoints in junction["waypoints_with_straight_turn"]]
             if pos_config["junctions"]["left"]:
-                allowed_waypoints += [(*waypoints, junction["object"].id) for junction in junctions_in_town
-                                    for waypoints in junction["waypoints_with_left_turn"]]
+                allowed_waypoints += [(*waypoints, junction["object"].id) for junction in
+                                      junctions_in_town
+                                      for waypoints in junction["waypoints_with_left_turn"]]
             if pos_config["junctions"]["right"]:
-                allowed_waypoints += [(*waypoints, junction["object"].id) for junction in junctions_in_town
-                                    for waypoints in junction["waypoints_with_right_turn"]]
+                allowed_waypoints += [(*waypoints, junction["object"].id) for junction in
+                                      junctions_in_town
+                                      for waypoints in junction["waypoints_with_right_turn"]]
 
             if not pos_config["streets"] and len(allowed_waypoints) == 0:
-                raise Exception(f"The requested junctions' configuration could not be "
-                                f"fulfilled for map <{town_name}>! Please exclude it in the "
-                                f"'map_blacklist' for this scenario!")
+                self.logger.error(f"The requested junctions' configuration could not be "
+                                  f"fulfilled for map <{town_name}>! Please exclude it in the "
+                                  f"'map_blacklist' for this scenario!")
+                raise SystemExit(0)
 
             if pos_config["streets"]:
                 allowed_waypoints += [(waypoint, None, None, None)

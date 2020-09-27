@@ -3,6 +3,9 @@ import time
 import carla
 from collections import defaultdict
 from enum import Enum
+from tqdm import tqdm
+
+from core.logger.logger import logger
 
 
 class RoadDirection(Enum):
@@ -151,7 +154,7 @@ def add_traffic_lights_at_junction(carla_client, current_map, map_name, junction
                         tries = 0
                         point = start_point
                     elif tries > threshold and not virgin:
-                        print("Junction not found in set threshold.")
+                        logger.debug("Junction not found in set threshold.")
                         continue
 
                     if switch and not virgin:
@@ -164,7 +167,7 @@ def add_traffic_lights_at_junction(carla_client, current_map, map_name, junction
                         except IndexError:
                             tries = threshold + 1
         except IndexError:
-            print("Junction not found because lane ended earlier.")
+            logger.debug("Junction not found because lane ended earlier.")
             continue
 
         junction = point.get_junction()
@@ -194,7 +197,8 @@ def add_junction_directions(junctions_per_map):
                         waypoint = waypoint.previous(0.5)[0]
                 start_waypoint = waypoint
 
-                # Check if start-waypoint is part of an already tracked connecting road (road + lane)
+                # Check if start-waypoint is part of an
+                # already tracked connecting road (road + lane)
                 if [start_waypoint.road_id, start_waypoint.lane_id] in already_seen_waypoints:
                     continue
                 else:
@@ -217,7 +221,7 @@ def add_junction_directions(junctions_per_map):
                 # Compute position of end-waypoint relative to start-waypoint,
                 # to determine the turn's direction
                 direction = get_lane_direction(start_waypoint.transform.rotation.yaw,
-                                                         end_waypoint.transform.rotation.yaw)
+                                               end_waypoint.transform.rotation.yaw)
                 if direction == RoadDirection.STRAIGHT:
                     junctions_per_map[junction_id]["waypoints_with_straight_turn"].append(
                         (waypoint_incoming_road,
@@ -314,18 +318,25 @@ def change_map(carla_client, map_name, number_tries=10, timeout=2):
         carla_client.load_world(map_name)
     except:
         pass
+    t = tqdm(total=1, unit="Try", leave=False)
     for idx in range(number_tries):
         # this fails if its currently changing as it cant connect in before timeout
         try:
             carla_client.get_world().get_map()
         except:
-            print(f'Attempt #{idx + 1} to get new map...')
+            t.set_description(f'Attempt #{idx + 1} to get new map')
+            t.total += 1
+            t.update(1)
         else:
-            print(f'New map loaded at attempt #{idx + 1}')
+            t.set_description(f'New map loaded at attempt #{idx + 1}')
+            t.update(1)
+            t.close()
             break
         if idx == (number_tries - 1):
-            raise Exception(
+            t.close()
+            logger.error(
                 "Could not change world in time. Please raise the timeout of the world loading")
+            raise SystemExit(0)
         time.sleep(timeout)
 
 

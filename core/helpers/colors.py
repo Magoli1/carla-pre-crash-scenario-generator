@@ -1,5 +1,7 @@
 from typing import List, Set
 
+from core.logger.logger import logger
+
 COLORS = {
     "Black": {"r": 0, "g": 0, "b": 0},
     "Maroon": {"r": 128, "g": 0, "b": 0},
@@ -49,5 +51,6 @@ def get_color_by_name(color_name: str) -> (int, int, int):
     :rtype: (int, int, int)
     """
     if color_name not in COLORS:
-        raise Exception("{} is not a supported color".format(color_name))
+        logger.error("{} is not a supported color".format(color_name))
+        raise SystemExit(0)
     return COLORS[color_name]["r"], COLORS[color_name]["g"], COLORS[color_name]["b"]
