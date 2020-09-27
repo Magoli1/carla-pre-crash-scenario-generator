@@ -3,6 +3,9 @@ import time
 import carla
 from collections import defaultdict
 from enum import Enum
+from tqdm import tqdm
+
+from core.logger.logger import logger
 
 
 class RoadDirection(Enum):
@@ -24,10 +27,6 @@ class RelativeDirection(Enum):
     OPPOSITE = 2
     LEFT = 3
     RIGHT = 4
-
-
-from core.logger.logger import logger
-from tqdm import tqdm
 
 
 def is_full_qualified_map_name(name):

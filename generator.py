@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
+import carla
+import argparse
+import logging
+
 from core.xml.initializer import initialize_xml_tree
 from core.xml.file_writer import write_xml
-
 from core.plugin.loader import get_plugin_classes_in_configured_order
 from core.configuration.loader import get_config
 from core.configuration.utils import extract_pipeline_name, extract_pipeline_config
 from core.data.provider import DataProvider
-
 from core.logger.logger import logger, set_logging_level, get_plugin_logger
-import logging
-
-import carla
-import argparse
 
 
 def main():

@@ -1,9 +1,9 @@
 import carla
+from tqdm import tqdm
+
 from core.helpers.utils import get_simple_map_name, change_map, get_junction_waypoints, \
     get_street_waypoints, add_traffic_lights_at_junction, add_junction_directions
-
 from core.logger.logger import logger
-from tqdm import tqdm
 
 
 def get_waypoints_for_all_maps(carla_client, distance=5):

@@ -1,4 +1,5 @@
 import logging
+
 from core.logger.log_formatter import CustomFormatter
 
 logger = logging.getLogger("CPCSG")  # Carla Pre Crash Scenario Generator

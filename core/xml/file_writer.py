@@ -1,8 +1,9 @@
 from pathlib import Path
 import time
 
-from core.xml.utils import get_pretty_xml
 from xml.etree.ElementTree import Comment
+
+from core.xml.utils import get_pretty_xml
 from core.logger.logger import logger
 
 
