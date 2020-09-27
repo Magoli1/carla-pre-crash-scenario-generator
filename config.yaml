@@ -30,6 +30,9 @@ pipelines:
             positioning:
                 junctions: False
                 streets: True
+        - Actor:
+            per_scenario: 5
+            tag: other_actor
         - Weather:
             generation_type: random_preset
             per_scenario: 5
@@ -46,6 +49,9 @@ pipelines:
             positioning:
               junctions: False
               streets: True
+        - Actor:
+            per_scenario: 5
+            tag: other_actor
         - Weather:
             generation_type: random_preset
             per_scenario: 5
