@@ -13,6 +13,7 @@ from __future__ import print_function
 import math
 import py_trees
 import carla
+import random
 
 from srunner.scenariomanager.carla_data_provider import CarlaDataProvider, CarlaActorPool
 from srunner.scenariomanager.scenarioatomics.atomic_behaviors import (ActorTransformSetter,
@@ -66,6 +67,12 @@ class DynamicObjectCrossing(BasicScenario):
         self._number_of_attempts = 20
         # Number of attempts made so far
         self._spawn_attempted = 0
+        self.static_blockers = [
+            'static.prop.atm', 'static.prop.bin', 'static.prop.vendingmachine',
+            'static.prop.busstop', 'static.prop.clothcontainer', 'static.prop.container',
+            'static.prop.fountain', 'static.prop.glasscontainer', 'static.prop.kiosk_01',
+            'static.prop.shop01', 'static.prop.streetbarrier', 'static.prop.swingcouch'
+        ]
 
         self._ego_route = CarlaDataProvider.get_ego_vehicle_route()
 
@@ -115,6 +122,9 @@ class DynamicObjectCrossing(BasicScenario):
 
         return adversary
 
+    def get_random_big_static_prop(self):
+        return random.choice(self.static_blockers)
+
     def _spawn_blocker(self, transform, orientation_yaw):
         """
         Spawn the blocker prop that blocks the vision from the egovehicle of the jaywalker
@@ -135,7 +145,7 @@ class DynamicObjectCrossing(BasicScenario):
                                                          spawn_point_wp.transform.location.z + 0.3),
                                           carla.Rotation(yaw=orientation_yaw + 180))
 
-        static = CarlaActorPool.request_new_actor('static.prop.vendingmachine', self.transform2)
+        static = CarlaActorPool.request_new_actor(self.get_random_big_static_prop(), self.transform2)
         static.set_simulate_physics(enabled=False)
 
         return static
