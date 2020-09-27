@@ -81,7 +81,10 @@ class SignalizedJunctionLeftTurn(BasicScenario):
                            config.other_actors[0].transform.location.y,
                            config.other_actors[0].transform.location.z - 500),
             config.other_actors[0].transform.rotation)
-        first_vehicle = CarlaActorPool.request_new_actor(config.other_actors[0].model, self._other_actor_transform)
+        first_vehicle = CarlaActorPool.request_new_actor(
+            config.other_actors[0].model,
+            first_vehicle_transform,
+            color=config.other_actors[0].color)
         first_vehicle.set_transform(first_vehicle_transform)
         first_vehicle.set_simulate_physics(enabled=False)
         self.other_actors.append(first_vehicle)
