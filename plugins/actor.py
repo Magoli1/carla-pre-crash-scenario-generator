@@ -4,8 +4,9 @@ import random
 
 
 class Actor:
-    def __init__(self, carla_client, config, data_provider, step_idx):
+    def __init__(self, carla_client, config, data_provider, step_idx, logger):
         self.client = carla_client
+        self.logger = logger
         if "type" not in config:
             config["type"] = "vehicle"
         self.actor_models = [actor.id for actor in
@@ -16,12 +17,14 @@ class Actor:
         if "tag" not in config:
             config["tag"] = "ego_vehicle"
         if config["tag"] not in ["ego_vehicle", "other_actor"]:
-            raise Exception(
+            self.logger.error(
                 "Actor generators optional property 'tag' must be in ['ego_vehicle', 'other_actor']")
+            raise SystemExit(0)
         if "per_scenario" not in config:
             config["per_scenario"] = 1
         if config["per_scenario"] <= 0:
-            raise Exception("Actor generators optional property 'per_scenario' cannot be <= 0")
+            self.logger.error("Actor generators optional property 'per_scenario' cannot be <= 0")
+            raise SystemExit(0)
         if "positioning" not in config:
             config["positioning"] = {"junctions": {"straight": True, "left": True, "right": True},
                                      "streets": True,
@@ -43,8 +46,9 @@ class Actor:
             not config["positioning"]["junctions"]["straight"] and \
             not config["positioning"]["junctions"]["left"] and \
             not config["positioning"]["junctions"]["right"]:
-            raise Exception(
+            self.logger.error(
                 "Actor generators optional properties 'streets' and 'junctions.<direction>' cannot all be 'False'")
+            raise SystemExit(0)
         self.config = config
         self.data_provider = data_provider
         self.step_idx = step_idx
@@ -73,9 +77,10 @@ class Actor:
             junctions_in_town = waypoints_in_town["junctions"].values()
 
         if len(junctions_in_town) == 0:
-            raise Exception(f"The requested junctions' traffic light configuration could not be "
-                            f"fulfilled for map <{town_name}>! Please exclude it in the "
-                            f"'map_blacklist' for this scenario!")
+            self.logger.error(f"The requested junctions' traffic light configuration could not be "
+                              f"fulfilled for map <{town_name}>! Please exclude it in the "
+                              f"'map_blacklist' for this scenario!")
+            raise SystemExit(0)
 
         if pos_config["junctions"]["straight"]:
             allowed_waypoints += [waypoints[0] for junction in junctions_in_town
@@ -88,9 +93,10 @@ class Actor:
                                   for waypoints in junction["waypoints_with_right_turn"]]
 
         if len(allowed_waypoints) == 0:
-            raise Exception(f"The requested junctions' configuration could not be "
-                            f"fulfilled for map <{town_name}>! Please exclude it in the "
-                            f"'map_blacklist' for this scenario!")
+            self.logger.error(f"The requested junctions' configuration could not be "
+                              f"fulfilled for map <{town_name}>! Please exclude it in the "
+                              f"'map_blacklist' for this scenario!")
+            raise SystemExit(0)
 
         if pos_config["streets"]:
             allowed_waypoints += waypoints_in_town["streets"]

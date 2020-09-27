@@ -2,6 +2,7 @@ from core.plugin.loader import get_plugin_classes, get_module_class_names
 from core.configuration.utils import get_pipeline_step_names, extract_pipeline_config, \
     extract_pipeline_name
 from core.helpers.utils import get_duplicates
+from core.logger.logger import logger
 
 
 def set_default_values(config):
@@ -28,7 +29,8 @@ def preprocess_config(config):
     :rtype: dict
     """
     if "pipelines" not in config:
-        raise Exception("Config error: Mandatory 'pipelines' key not found in config")
+        logger.error("Config error: Mandatory 'pipelines' key not found in config")
+        raise SystemExit(0)
     check_pipelines_config(config["pipelines"])
     if "dataprovider" in config:
         check_data_provider_config_valid(config["dataprovider"])
@@ -42,7 +44,8 @@ def check_pipelines_config(pipelines_config):
     :type pipelines_config: dict
     """
     if not isinstance(pipelines_config, list):
-        raise Exception("Config error: 'pipelines' value needs to be a list")
+        logger.error("Config error: 'pipelines' value needs to be a list")
+        raise SystemExit(0)
     check_duplicate_pipeline_names(pipelines_config)
     for idx, pipeline in enumerate(pipelines_config):
         pipeline_config = extract_pipeline_config(pipeline)
@@ -58,8 +61,9 @@ def check_duplicate_pipeline_names(pipelines_config):
     pipeline_names = [extract_pipeline_name(pipeline) for pipeline in pipelines_config]
     duplicates = get_duplicates(pipeline_names)
     if duplicates:
-        raise Exception(
+        logger.error(
             f'Only globally unique pipeline names are allowed. Found duplicates {duplicates}')
+        raise SystemExit(0)
 
 
 def check_pipeline_config_valid(idx, pipeline_config):
@@ -71,9 +75,11 @@ def check_pipeline_config_valid(idx, pipeline_config):
     :type pipeline_config: dict
     """
     if not isinstance(pipeline_config, dict):
-        raise Exception(f'Config error at pipeline #{idx}: "pipeline" entity needs to be a dict')
+        logger.error(f'Config error at pipeline #{idx}: "pipeline" entity needs to be a dict')
+        raise SystemExit(0)
     if "steps" not in pipeline_config:
-        raise Exception(f'Config error at pipeline #{idx}: "steps" value is missing')
+        logger.error(f'Config error at pipeline #{idx}: "steps" value is missing')
+        raise SystemExit(0)
     check_steps_config_valid(idx, pipeline_config["steps"])
 
 
@@ -84,9 +90,11 @@ def check_data_provider_config_valid(data_provider_config):
     :type data_provider_config: dict
     """
     if not isinstance(data_provider_config, dict):
-        raise Exception("Config error: 'dataprovider' value needs to be a dictionary")
+        logger.error("Config error: 'dataprovider' value needs to be a dictionary")
+        raise SystemExit(0)
     if "preload" in data_provider_config and not isinstance(data_provider_config["preload"], bool):
-        raise Exception("Config error: 'dataprovider:preload' value needs to be a boolean")
+        logger.error("Config error: 'dataprovider:preload' value needs to be a boolean")
+        raise SystemExit(0)
 
 
 def check_steps_config_valid(idx, steps_config):
@@ -98,12 +106,14 @@ def check_steps_config_valid(idx, steps_config):
     :type steps_config: dict
     """
     if not isinstance(steps_config, list):
-        raise Exception(f'Config error at pipeline #{idx}: "steps" value needs to be a list')
+        logger.error(f'Config error at pipeline #{idx}: "steps" value needs to be a list')
+        raise SystemExit(0)
     # check if all configured pipeline steps actually exist via a class in the plugins section
     classes = get_plugin_classes()
     class_names = get_module_class_names(classes)
     pipeline_step_names = get_pipeline_step_names(steps_config)
     is_subset = set(pipeline_step_names).issubset(class_names)
     if not is_subset:
-        raise Exception(
+        logger.error(
             f'Config error at pipeline #{idx}: One or more of the configured steps do not correspond to a valid class name. Value needs to be in {class_names}')
+        raise SystemExit(0)

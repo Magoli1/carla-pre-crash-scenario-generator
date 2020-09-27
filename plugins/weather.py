@@ -7,16 +7,19 @@ from core.helpers.utils import extend_scenarios
 
 
 class Weather:
-    def __init__(self, carla_client, config, data_provider, step_idx):
+    def __init__(self, carla_client, config, data_provider, step_idx, logger):
         self.client = carla_client
+        self.logger = logger
         if "per_scenario" not in config:
             config["per_scenario"] = 1
         if config["per_scenario"] <= 0:
-            raise Exception("Weather generators optional property 'per_scenario' cannot be <= 0")
+            self.logger.error("Weather generators optional property 'per_scenario' cannot be <= 0")
+            raise SystemExit(0)
         if "generation_type" not in config:
             config["generation_type"] = "random_preset"
         if config["generation_type"] not in ["random_preset", "random"]:
-            raise Exception("Weather genernation_type must be either 'random_preset' or 'random'")
+            self.logger.error("Weather genernation_type must be either 'random_preset' or 'random'")
+            raise SystemExit(0)
         self.config = config
         self.data_provider = data_provider
         self.step_idx = step_idx
