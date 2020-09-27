@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from core.xml.initializer import initialize_xml_tree
 from core.xml.file_writer import write_xml
 

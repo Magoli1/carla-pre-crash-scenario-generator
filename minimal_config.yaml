@@ -14,13 +14,28 @@ pipelines:
             per_scenario: 5
             tag: ego_vehicle
             positioning:
-                junctions:
-                    straight: False
-                    left: False
-                    right: True
-                    has_traffic_lights: False  # <True|False|Only>
-                streets: False
-              four_wheelers_only: True
+              junctions:
+                straight: False
+                left: False
+                right: True
+                has_traffic_lights: False # <True|False|Only>
+              streets: False
+            four_wheelers_only: True
+        - Actor:
+            per_scenario: 5
+            tag: other_actor
+            positioning:
+              junctions:
+                straight: False
+                left: False
+                right: True
+                has_traffic_lights: False
+                relative_to_ego:
+                  straight: False
+                  left: True
+                  right: True
+              streets: False
+            four_wheelers_only: False
         - Weather:
             generation_type: random_preset
             per_scenario: 5
