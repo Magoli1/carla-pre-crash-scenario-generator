@@ -2,6 +2,28 @@ import copy
 import time
 import carla
 from collections import defaultdict
+from enum import Enum
+
+
+class RoadDirection(Enum):
+    """
+    RoadDirection represents the direction of the lane
+    between two waypoints.
+    """
+    LEFT = 1
+    RIGHT = 2
+    STRAIGHT = 3
+
+
+class RelativeDirection(Enum):
+    """
+    RelativeDirection represents the relative direction
+    between two points.
+    """
+    SAME = 1
+    OPPOSITE = 2
+    LEFT = 3
+    RIGHT = 4
 
 from core.logger.logger import logger
 from tqdm import tqdm
@@ -197,32 +219,83 @@ def add_junction_directions(junctions_per_map):
 
                 # Compute position of end-waypoint relative to start-waypoint,
                 # to determine the turn's direction
-                threshold = 35
-                n = end_waypoint.transform.rotation.yaw
-                n = n % 360.0
-                c = start_waypoint.transform.rotation.yaw
-                c = c % 360.0
-                diff_angle = (n - c) % 180.0
-                if diff_angle < threshold or diff_angle > (180 - threshold):
-                    # STRAIGHT
+                direction = get_lane_direction(start_waypoint.transform.rotation.yaw,
+                                                         end_waypoint.transform.rotation.yaw)
+                if direction == RoadDirection.STRAIGHT:
                     junctions_per_map[junction_id]["waypoints_with_straight_turn"].append(
                         (waypoint_incoming_road,
                          start_waypoint,
                          waypoint_outgoing_road))
-                elif diff_angle > 90.0:
-                    # LEFT
+                elif direction == RoadDirection.LEFT:
                     junctions_per_map[junction_id]["waypoints_with_left_turn"].append(
                         (waypoint_incoming_road,
                          start_waypoint,
                          waypoint_outgoing_road))
-                else:
-                    # RIGHT
+                elif direction == RoadDirection.RIGHT:
                     junctions_per_map[junction_id]["waypoints_with_right_turn"].append(
                         (waypoint_incoming_road,
                          start_waypoint,
                          waypoint_outgoing_road))
 
     return junctions_per_map
+
+
+def get_lane_direction(yaw_start: float,
+                       yaw_end: float,
+                       threshold: int = 35) -> RoadDirection:
+    """Compute the direction of a lane between a start and an end point
+
+    The function calculates the direction of a lane using the yaw values
+    (rotation around the Z axis) of the start and end waypoints.
+
+    :param yaw_start: The rotation around the Z axis of the start waypoint
+    :type yaw_start: float
+    :param yaw_end: The rotation around the Z axis of the end waypoint
+    :type yaw_end: float
+    :param threshold: The threshold value for the angle when determining the direction
+    :type threshold: int
+    :returns: Direction of the lane between the two waypoints
+    :rtype: RoadDirection
+    """
+    n = yaw_end % 360.0
+    c = yaw_start % 360.0
+    diff_angle = (n - c) % 180.0
+    if diff_angle < threshold or diff_angle > (180 - threshold):
+        return RoadDirection.STRAIGHT
+    elif diff_angle > 90.0:
+        return RoadDirection.LEFT
+    else:
+        return RoadDirection.RIGHT
+
+
+def get_relative_direction_between_points(yaw_first: float,
+                                          yaw_second: float,
+                                          threshold: int = 35) -> RelativeDirection:
+    """Compute the relative direction between two points
+
+    The function calculates the direction of a lane using the yaw values
+    (rotation around the Z axis) of the start and end waypoints.
+
+    :param yaw_start: The rotation around the Z axis of the first point
+    :type yaw_start: float
+    :param yaw_end: The rotation around the Z axis of the secoind point
+    :type yaw_end: float
+    :param threshold: The threshold value for the angle when determining the direction
+    :type threshold: int
+    :returns: Direction of the second point in relation to the first point
+    :rtype: RelativeDirection
+    """
+    n = yaw_first % 360.0
+    c = yaw_second % 360.0
+    diff_angle = (n - c) % 360.0
+    if diff_angle < threshold or diff_angle > (360 - threshold):
+        return RelativeDirection.SAME
+    elif diff_angle > (180 - threshold) and diff_angle < (180 + threshold):
+        return RelativeDirection.OPPOSITE
+    elif diff_angle < 180:
+        return RelativeDirection.RIGHT
+    else:
+        return RelativeDirection.LEFT
 
 
 def change_map(carla_client, map_name, number_tries=10, timeout=2):

@@ -12,8 +12,13 @@ pipelines:
             tag: ego_vehicle # optional, default ego_vehicle
             type: vehicle # optional, default vehicle
             positioning: # optional, default junctions: True, streets: True
-                junctions: False
-                streets: True
+                junctions: # optional
+                  straight: False # optional, default: True
+                  left: False # optional, default: True
+                  right: False # optional, default: True
+                  has_traffic_lights: False # optional, <True|False|Only>, default: True
+                streets: True # optional, default: True
+            four_wheelers_only: True # optional, default: True
         - Weather:
             generation_type: random_preset # chose from {random, random_preset} default: random_preset
             per_scenario: 5 # optional, default 1
@@ -30,6 +35,7 @@ pipelines:
             positioning:
                 junctions: False
                 streets: True
+            four_wheelers_only: True
         - Weather:
             generation_type: random_preset
             per_scenario: 5
@@ -46,6 +52,7 @@ pipelines:
             positioning:
               junctions: False
               streets: True
+            four_wheelers_only: True
         - Weather:
             generation_type: random_preset
             per_scenario: 5
@@ -62,38 +69,56 @@ pipelines:
             positioning:
                 junctions: False
                 streets: True
+            four_wheelers_only: True
         - Weather:
             generation_type: random_preset
             per_scenario: 5
 
-  # 4.1 Scenario VehicleTurningRight !!! TBD: Only right turns are allowed
+  # 4.1 Scenario VehicleTurningRight
   - 4_1_VehicleTurning_right_generated:
       steps:
         - Scenario:
             name_prefix: VehicleTurningRight_generated
             type: VehicleTurningRight
+            map_blacklist:
+              - Town01
+              - Town02
+              - Town06
         - Actor:
             per_scenario: 5
             tag: ego_vehicle
             positioning:
-                junctions: True
+                junctions:
+                  straight: False
+                  left: False
+                  right: True
+                  has_traffic_lights: False
                 streets: False
+            four_wheelers_only: True
         - Weather:
             generation_type: random_preset
             per_scenario: 5
 
-  # 4.2 Scenario VehicleTurningLeft !!! TBD: Only left turns are allowed
+  # 4.2 Scenario VehicleTurningLeft
   - 4_2_VehicleTurning_left_generated:
       steps:
         - Scenario:
             name_prefix: VehicleTurningLeft_generated
             type: VehicleTurningLeft
+            map_blacklist:
+              - Town01
+              - Town02
         - Actor:
             per_scenario: 5
             tag: ego_vehicle
             positioning:
-                junctions: True
+                junctions:
+                  straight: False
+                  left: True
+                  right: False
+                  has_traffic_lights: False
                 streets: False
+            four_wheelers_only: True
         - Weather:
             generation_type: random_preset
             per_scenario: 5
@@ -110,6 +135,7 @@ pipelines:
             positioning:
                 junctions: False
                 streets: True
+            four_wheelers_only: True
         - Weather:
             generation_type: random_preset
             per_scenario: 5
@@ -126,11 +152,12 @@ pipelines:
             positioning:
                 junctions: False
                 streets: True
+            four_wheelers_only: True
         - Weather:
             generation_type: random_preset
             per_scenario: 5
 
-  # 7 Scenario OppositeVehicleRunningRedLight !!! TBD: Other actor must come from left of right
+  # 7 Scenario OppositeVehicleRunningRedLight
   - 7_RunningRedLight_generated:
       steps:
         - Scenario:
@@ -140,19 +167,32 @@ pipelines:
             per_scenario: 5
             tag: ego_vehicle
             positioning:
-                junctions: True
+                junctions:
+                  straight: True
+                  left: False
+                  right: False
+                  has_traffic_lights: Only
                 streets: False
+            four_wheelers_only: True
         - Actor:
             per_scenario: 5
             tag: other_actor
             positioning:
-                junctions: True
+                junctions:
+                  straight: True
+                  left: True
+                  right: False
+                  relative_to_ego: # optional
+                    straight: False # optional, default: True
+                    left: True # optional, default: True
+                    right: True # optional, default: True
                 streets: False
+            four_wheelers_only: False
         - Weather:
             generation_type: random_preset
             per_scenario: 5
 
-  # 8 Scenario SignalizedJunctionLeftTurn !!! TBD: Other actor must come from straight ahead
+  # 8 Scenario SignalizedJunctionLeftTurn
   - 8_SignalizedJunctionLeftTurn_generated:
       steps:
         - Scenario:
@@ -162,19 +202,32 @@ pipelines:
             per_scenario: 5
             tag: ego_vehicle
             positioning:
-                junctions: True
+                junctions:
+                  straight: False
+                  left: True
+                  right: False
+                  has_traffic_lights: Only
                 streets: False
+            four_wheelers_only: True
         - Actor:
             per_scenario: 5
             tag: other_actor
             positioning:
-                junctions: True
+                junctions:
+                  straight: True
+                  left: False
+                  right: False
+                  relative_to_ego:
+                    straight: True
+                    left: False
+                    right: False
                 streets: False
+            four_wheelers_only: False
         - Weather:
             generation_type: random_preset
             per_scenario: 5
 
-  # 9 Scenario SignalizedJunctionRightTurn !!! TBD: Other actor must come from left
+  # 9 Scenario SignalizedJunctionRightTurn
   - 9_SignalizedJunctionRightTurn_generated:
       steps:
         - Scenario:
@@ -184,36 +237,65 @@ pipelines:
             per_scenario: 5
             tag: ego_vehicle
             positioning:
-                junctions: True
+                junctions:
+                  straight: False
+                  left: False
+                  right: True
+                  has_traffic_lights: Only
                 streets: False
+            four_wheelers_only: True
         - Actor:
             per_scenario: 5
             tag: other_actor
             positioning:
-                junctions: True
+                junctions:
+                  straight: True
+                  left: False
+                  right: False
+                  relative_to_ego:
+                    straight: False
+                    left: True
+                    right: False
                 streets: False
+            four_wheelers_only: False
         - Weather:
             generation_type: random_preset
             per_scenario: 5
 
-  # 10 Scenario SignalizedJunctionRightTurn !!! TBD: Other actor must come from left
+  # 10 Scenario SignalizedJunctionRightTurn
   - 10_NoSignalJunction_generated:
       steps:
         - Scenario:
             name_prefix: NoSignalJunctionCrossing_generated
             type: NoSignalJunctionCrossing
+            map_blacklist:
+              - Town01
+              - Town02
         - Actor:
             per_scenario: 5
             tag: ego_vehicle
             positioning:
-                junctions: True
+                junctions:
+                  straight: True
+                  left: True
+                  right: True
+                  has_traffic_lights: False
                 streets: False
+            four_wheelers_only: True
         - Actor:
             per_scenario: 5
             tag: other_actor
             positioning:
-                junctions: True
+                junctions:
+                  straight: True
+                  left: True
+                  right: True
+                  relative_to_ego:
+                    straight: True
+                    left: True
+                    right: True
                 streets: False
+            four_wheelers_only: False
         - Weather:
             generation_type: random_preset
             per_scenario: 5
