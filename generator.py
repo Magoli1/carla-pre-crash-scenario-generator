@@ -19,7 +19,7 @@ def main():
     """
     args = get_args()
     set_logging_level(args.loglevel)
-    logger.info("#### Pre Crash Scenrio Generator ####")
+    logger.info("#### Pre Crash Scenario Generator ####")
     generator_config = get_config(args.config)
     client = carla.Client(args.host, args.port)
     client.set_timeout(args.timeout)
