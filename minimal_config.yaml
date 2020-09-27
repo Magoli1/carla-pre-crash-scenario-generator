@@ -20,6 +20,7 @@ pipelines:
                 right: True
                 has_traffic_lights: False # <True|False|Only>
               streets: False
+            four_wheelers_only: True
         - Actor:
             per_scenario: 5
             tag: other_actor
@@ -34,6 +35,7 @@ pipelines:
                   left: True
                   right: True
               streets: False
+            four_wheelers_only: False
         - Weather:
             generation_type: random_preset
             per_scenario: 5
