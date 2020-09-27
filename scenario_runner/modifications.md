@@ -21,3 +21,6 @@ In the following the files are listed which have been extended with additional f
 
 `srunner/scenarios/signalized_junction_right_turn.py`
 - Added reading color of the other actor from config
+
+`srunner/scenarios/object_crash_vehicle.py`
+- Added random static object instead of only vendingmachine
