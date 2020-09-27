@@ -2,25 +2,35 @@ from xml.etree.ElementTree import Element
 
 from core.helpers.utils import extend_scenarios
 
+
 class Scenario:
-    def __init__(self, carla_client, config, data_provider, step_idx):
+    def __init__(self, carla_client, config, data_provider, step_idx, logger):
         self.client = carla_client
+        self.logger = logger
         if "type" not in config:
-            raise Exception("Scenario generator property 'type' is mandatory")
+            self.logger.error("Scenario generator property 'type' is mandatory")
+            raise SystemExit(0)
         if "name_prefix" not in config:
             config["name_prefix"] = config["type"]
         all_maps = data_provider.get_available_maps_simple_name()
         if "map_blacklist" in config:
             if not isinstance(config["map_blacklist"], list):
-                raise Exception("Scenario generator property 'map_blacklist' needs to be a list")
+                self.logger.error("Scenario generator property 'map_blacklist' needs to be a list")
+                raise SystemExit(0)
             if not config["map_blacklist"]:
-                raise Exception("Scenario generator property 'map_blacklist' is not allowed to be empty")
+                self.logger.error(
+                    "Scenario generator property 'map_blacklist' is not allowed to be empty")
+                raise SystemExit(0)
             is_subset = set(config["map_blacklist"]).issubset(all_maps)
             if not is_subset:
-                raise Exception(f'Scenario generator property "map_blacklist" has one value which is not in {all_maps}')
+                self.logger.error(
+                    f'Scenario generator property "map_blacklist" '
+                    f'has one value which is not in {all_maps}')
+                raise SystemExit(0)
         else:
             config["map_blacklist"] = []
-        self.maps = [carla_map for carla_map in all_maps if carla_map not in config["map_blacklist"]]
+        self.maps = [carla_map for carla_map in all_maps if
+                     carla_map not in config["map_blacklist"]]
         self.config = config
         self.data_provider = data_provider
         self.step_idx = step_idx

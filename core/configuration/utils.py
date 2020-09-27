@@ -1,3 +1,6 @@
+from core.logger.logger import logger
+
+
 def get_pipeline_step_names(step_config):
     """Extracts the step names from the configured steps of a pipeline
 
@@ -13,8 +16,10 @@ def get_pipeline_step_names(step_config):
         elif isinstance(step, str):
             step_names.append(step)
         else:
-            raise Exception("Pipeline config not valid")
+            logger.error("Pipeline config not valid")
+            raise SystemExit(0)
     return step_names
+
 
 def extract_pipeline_name(pipeline):
     """Extracts the name of a configured pipeline
@@ -25,6 +30,7 @@ def extract_pipeline_name(pipeline):
     :rtype: str
     """
     return list(pipeline.keys())[0]
+
 
 def extract_pipeline_config(pipeline):
     """Extracts the configuration entities of a pipeline
