@@ -58,7 +58,7 @@ def start_pipeline(carla_client, generator_config, data_provider, log_level):
             else:
                 step_config = list(step_config.values())[0]
             instance = Class(carla_client, step_config, data_provider, idx,
-                             get_plugin_logger(Class.__name__), log_level)
+                             get_plugin_logger(Class.__name__, log_level))
             instance.generate(tree)
             logger.info(f'# END pipeline step #{idx} {Class.__name__} END #')
         write_xml(tree, filename=pipeline_name)
