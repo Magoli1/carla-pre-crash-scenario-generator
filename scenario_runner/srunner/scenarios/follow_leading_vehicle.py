@@ -100,7 +100,10 @@ class FollowLeadingVehicle(BasicScenario):
                            self._other_actor_transform.location.y,
                            self._other_actor_transform.location.z - 500),
             self._other_actor_transform.rotation)
-        first_vehicle = CarlaActorPool.request_new_actor('vehicle.nissan.patrol', first_vehicle_transform)
+        first_vehicle = CarlaActorPool.request_new_actor(
+            config.other_actors[0].model,
+            first_vehicle_transform,
+            color=config.other_actors[0].color)
         first_vehicle.set_simulate_physics(enabled=False)
         self.other_actors.append(first_vehicle)
 

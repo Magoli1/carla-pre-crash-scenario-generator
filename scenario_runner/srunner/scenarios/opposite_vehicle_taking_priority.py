@@ -106,7 +106,10 @@ class OppositeVehicleRunningRedLight(BasicScenario):
                            config.other_actors[0].transform.location.y,
                            config.other_actors[0].transform.location.z),
             config.other_actors[0].transform.rotation)
-        first_vehicle = CarlaActorPool.request_new_actor(config.other_actors[0].model, first_vehicle_transform)
+        first_vehicle = CarlaActorPool.request_new_actor(
+            config.other_actors[0].model,
+            first_vehicle_transform,
+            color=config.other_actors[0].color)
         self.other_actors.append(first_vehicle)
 
     def _create_behavior(self):

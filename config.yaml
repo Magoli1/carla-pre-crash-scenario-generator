@@ -36,6 +36,10 @@ pipelines:
                 junctions: False
                 streets: True
             four_wheelers_only: True
+        - Actor:
+            per_scenario: 5
+            tag: other_actor
+            four_wheelers_only: False
         - Weather:
             generation_type: random_preset
             per_scenario: 5
@@ -53,6 +57,10 @@ pipelines:
               junctions: False
               streets: True
             four_wheelers_only: True
+        - Actor:
+            per_scenario: 5
+            tag: other_actor
+            four_wheelers_only: False
         - Weather:
             generation_type: random_preset
             per_scenario: 5
