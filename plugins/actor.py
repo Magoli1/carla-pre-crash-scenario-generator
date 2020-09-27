@@ -121,8 +121,8 @@ class Actor:
                 allowed_waypoints = self.get_allowed_waypoints_in_town(scenario.get("town"))
             if not allowed_waypoints:
                 tree.getroot().remove(scenario)
-                print(f"One Scenario was removed, because there is no "
-                      f"allowed waypoint for {self.config['tag']}")
+                self.logger.debug(f"One Scenario was removed, because there is no "
+                                  f"allowed waypoint for {self.config['tag']}")
                 continue
             waypoint = random.choice(allowed_waypoints)
             attributes["waypoint"] = waypoint[0]
