@@ -1,7 +1,8 @@
-from xml.etree.ElementTree import SubElement
-from core.helpers.colors import get_color_names, compare_color_lists, get_color_by_name
-from core.helpers.utils import extend_scenarios
 import random
+from xml.etree.ElementTree import SubElement
+
+from core.helpers.colors import get_color_names, compare_color_lists, get_color_by_name
+from core.helpers.utils import extend_scenarios, RelativeDirection, get_relative_direction_between_points
 
 
 class Actor:
@@ -9,11 +10,22 @@ class Actor:
         self.client = carla_client
         if "type" not in config:
             config["type"] = "vehicle"
-        self.actor_models = [actor.id for actor in
-                             self.client.get_world().get_blueprint_library().filter(
-                                 config["type"])]
-        self.actor_models.remove('vehicle.bh.crossbike')
-
+        self.actor_models = []
+        available_actors = [actor for actor in
+                            self.client.get_world().get_blueprint_library().filter(config["type"])]
+        if "four_wheelers_only" not in config:
+            config["four_wheelers_only"] = True
+        if config["four_wheelers_only"]:
+            for actor in available_actors:
+                if actor.has_attribute('number_of_wheels') and actor.get_attribute('number_of_wheels').as_int() == 4:
+                    self.actor_models.append(actor.id)
+        else:
+            self.actor_models = [actor.id for actor in available_actors]
+        if not self.actor_models:
+            if not available_actors:
+                raise Exception(f"No vehicles for type {config['type']} found")
+            else:
+                raise Exception(f"No four wheelers for type {config['type']} found")
         if "tag" not in config:
             config["tag"] = "ego_vehicle"
         if config["tag"] not in ["ego_vehicle", "other_actor"]:
@@ -27,25 +39,50 @@ class Actor:
             config["positioning"] = {"junctions": {"straight": True, "left": True, "right": True},
                                      "streets": True,
                                      "distance_between": 5}
-        if "junctions" not in config["positioning"]:
-            config["positioning"]["junctions"] = {"straight": True, "left": True, "right": True,
-                                                  "has_traffic_lights": True}
+        if "junctions" not in config["positioning"] or config["positioning"]["junctions"] is True:
+            config["positioning"]["junctions"] = {"straight": True, "left": True, "right": True}
+        elif config["positioning"]["junctions"] is False:
+            config["positioning"]["junctions"] = {"straight": False, "left": False, "right": False}
         if "straight" not in config["positioning"]["junctions"]:
             config["positioning"]["junctions"]["straight"] = True
         if "left" not in config["positioning"]["junctions"]:
             config["positioning"]["junctions"]["left"] = True
         if "right" not in config["positioning"]["junctions"]:
             config["positioning"]["junctions"]["right"] = True
-        if "has_traffic_lights" not in config["positioning"]["junctions"]:
-            config["positioning"]["junctions"]["has_traffic_lights"] = True
+
+        if "relative_to_ego" not in config["positioning"]["junctions"]:
+            config["positioning"]["junctions"]["relative_to_ego"] \
+                = {"straight": True, "left": True, "right": True}
+        if "straight" not in config["positioning"]["junctions"]["relative_to_ego"]:
+            config["positioning"]["junctions"]["relative_to_ego"]["straight"] = True
+        if "left" not in config["positioning"]["junctions"]["relative_to_ego"]:
+            config["positioning"]["junctions"]["relative_to_ego"]["left"] = True
+        if "right" not in config["positioning"]["junctions"]["relative_to_ego"]:
+            config["positioning"]["junctions"]["relative_to_ego"]["right"] = True
+
         if "streets" not in config["positioning"]:
             config["positioning"]["streets"] = True
+
+        if "has_traffic_lights" not in config["positioning"]["junctions"]:
+            config["positioning"]["junctions"]["has_traffic_lights"] = True
+
         if not config["positioning"]["streets"] and \
             not config["positioning"]["junctions"]["straight"] and \
             not config["positioning"]["junctions"]["left"] and \
             not config["positioning"]["junctions"]["right"]:
             raise Exception(
                 "Actor generators optional properties 'streets' and 'junctions.<direction>' cannot all be 'False'")
+
+        if (config["tag"] == "other_actor"
+            and not all(switch is False for switch
+                        in config["positioning"]["junctions"]["relative_to_ego"].values())
+            and (not config["positioning"]["junctions"]["straight"] and
+                 not config["positioning"]["junctions"]["left"] and
+                 not config["positioning"]["junctions"]["right"])):
+            raise Exception(
+                "Actor generators optional properties of 'relative_to_ego' "
+                "cannot be 'True' if all directions in 'junctions' are 'False'"
+            )
 
         if "colors" not in config or not config["colors"] or not isinstance(config["colors"], list):
             config["colors"] = get_color_names()
@@ -65,47 +102,112 @@ class Actor:
         for scenario in tree.getroot().getchildren():
             actor = SubElement(scenario, self.config["tag"])
             attributes = {}
-            attributes["waypoint"] = random.choice(
-                self.get_allowed_waypoints_in_town(scenario.get("town")))
+            if self.config["tag"] == "other_actor":
+                relative_to_ego = not all(switch is False for switch in
+                                          self.config["positioning"]["junctions"]["relative_to_ego"].values())
+                ego_vehicle = scenario.find("ego_vehicle")
+                junction_id = None
+                start_point_yaw = None
+                if ego_vehicle is not None:
+                    junction_id = ego_vehicle.get("junction_id")
+                    start_point_yaw = ego_vehicle.get("start_point_yaw")
+                if junction_id is not None:
+                    junction_id = int(junction_id)
+                if start_point_yaw is not None:
+                    start_point_yaw = float(start_point_yaw)
+                allowed_waypoints = self.get_allowed_waypoints_in_town(scenario.get("town"),
+                                                                       relative_to_ego,
+                                                                       junction_id,
+                                                                       start_point_yaw)
+            else:
+                allowed_waypoints = self.get_allowed_waypoints_in_town(scenario.get("town"))
+            if not allowed_waypoints:
+                tree.getroot().remove(scenario)
+                print(f"One Scenario was removed, because there is no "
+                      f"allowed waypoint for {self.config['tag']}")
+                continue
+            waypoint = random.choice(allowed_waypoints)
+            attributes["waypoint"] = waypoint[0]
+            if waypoint[3]:
+                attributes["junction_id"] = waypoint[3]
+            if waypoint[1]:
+                attributes["start_point_yaw"] = waypoint[1]
             attributes["actor_model"] = random.choice(self.actor_models)
             attributes["actor_color"] = random.choice(self.config["colors"])
             self.decorate_actor(actor, **attributes)
 
-    def get_allowed_waypoints_in_town(self, town_name):
+    def get_allowed_waypoints_in_town(self, town_name: str, relative_to_ego: bool = False,
+                                      junction_id: int = None, start_point_yaw: float = None):
         pos_config = self.config["positioning"]
         waypoints_in_town = self.data_provider.get_waypoints_per_map()[town_name]
         allowed_waypoints = []
-        if pos_config["junctions"]["has_traffic_lights"] == "Only":
-            junctions_in_town = [junction for junction in waypoints_in_town["junctions"].values()
-                                 if "traffic_lights" in junction]
-        elif not pos_config["junctions"]["has_traffic_lights"]:
-            junctions_in_town = [junction for junction in waypoints_in_town["junctions"].values()
-                                 if "traffic_lights" not in junction]
+
+        if relative_to_ego:
+            if not junction_id or not start_point_yaw:
+                if pos_config["streets"]:
+                    return [(waypoint, None, None, None) for waypoint in waypoints_in_town["streets"]]
+                else:
+                    return []
+
+            allowed_directions = []
+            if pos_config["junctions"]["relative_to_ego"]["straight"]:
+                allowed_directions.append(RelativeDirection.OPPOSITE)
+            if pos_config["junctions"]["relative_to_ego"]["left"]:
+                allowed_directions.append(RelativeDirection.LEFT)
+            if pos_config["junctions"]["relative_to_ego"]["right"]:
+                allowed_directions.append(RelativeDirection.RIGHT)
+
+            possible_waypoints = []
+            if pos_config["junctions"]["straight"]:
+                possible_waypoints += [(*waypoints, junction_id) for waypoints
+                                      in waypoints_in_town["junctions"][junction_id]["waypoints_with_straight_turn"]]
+            if pos_config["junctions"]["left"]:
+                possible_waypoints += [(*waypoints, junction_id) for waypoints
+                                      in waypoints_in_town["junctions"][junction_id]["waypoints_with_left_turn"]]
+            if pos_config["junctions"]["right"]:
+                possible_waypoints += [(*waypoints, junction_id) for waypoints
+                                      in waypoints_in_town["junctions"][junction_id]["waypoints_with_right_turn"]]
+
+            for waypoints in possible_waypoints:
+                if get_relative_direction_between_points(
+                        start_point_yaw,
+                        waypoints[1].transform.rotation.yaw) in allowed_directions:
+                    allowed_waypoints.append((*waypoints, junction_id))
+
         else:
-            junctions_in_town = waypoints_in_town["junctions"].values()
+            if pos_config["junctions"]["has_traffic_lights"] == "Only":
+                junctions_in_town = [junction for junction in waypoints_in_town["junctions"].values()
+                                    if "traffic_lights" in junction]
+            elif not pos_config["junctions"]["has_traffic_lights"]:
+                junctions_in_town = [junction for junction in waypoints_in_town["junctions"].values()
+                                    if "traffic_lights" not in junction]
+            else:
+                junctions_in_town = waypoints_in_town["junctions"].values()
 
-        if len(junctions_in_town) == 0:
-            raise Exception(f"The requested junctions' traffic light configuration could not be "
-                            f"fulfilled for map <{town_name}>! Please exclude it in the "
-                            f"'map_blacklist' for this scenario!")
+            if not pos_config["streets"] and len(junctions_in_town) == 0:
+                raise Exception(f"The requested junctions' traffic light configuration could not be "
+                                f"fulfilled for map <{town_name}>! Please exclude it in the "
+                                f"'map_blacklist' for this scenario!")
 
-        if pos_config["junctions"]["straight"]:
-            allowed_waypoints += [waypoints[0] for junction in junctions_in_town
-                                  for waypoints in junction["waypoints_with_straight_turn"]]
-        if pos_config["junctions"]["left"]:
-            allowed_waypoints += [waypoints[0] for junction in junctions_in_town
-                                  for waypoints in junction["waypoints_with_left_turn"]]
-        if pos_config["junctions"]["right"]:
-            allowed_waypoints += [waypoints[0] for junction in junctions_in_town
-                                  for waypoints in junction["waypoints_with_right_turn"]]
+            if pos_config["junctions"]["straight"]:
+                allowed_waypoints += [(*waypoints, junction["object"].id) for junction in junctions_in_town
+                                    for waypoints in junction["waypoints_with_straight_turn"]]
+            if pos_config["junctions"]["left"]:
+                allowed_waypoints += [(*waypoints, junction["object"].id) for junction in junctions_in_town
+                                    for waypoints in junction["waypoints_with_left_turn"]]
+            if pos_config["junctions"]["right"]:
+                allowed_waypoints += [(*waypoints, junction["object"].id) for junction in junctions_in_town
+                                    for waypoints in junction["waypoints_with_right_turn"]]
 
-        if len(allowed_waypoints) == 0:
-            raise Exception(f"The requested junctions' configuration could not be "
-                            f"fulfilled for map <{town_name}>! Please exclude it in the "
-                            f"'map_blacklist' for this scenario!")
+            if not pos_config["streets"] and len(allowed_waypoints) == 0:
+                raise Exception(f"The requested junctions' configuration could not be "
+                                f"fulfilled for map <{town_name}>! Please exclude it in the "
+                                f"'map_blacklist' for this scenario!")
 
-        if pos_config["streets"]:
-            allowed_waypoints += waypoints_in_town["streets"]
+            if pos_config["streets"]:
+                allowed_waypoints += [(waypoint, None, None, None)
+                                      for waypoint in waypoints_in_town["streets"]]
+
         return allowed_waypoints
 
     def decorate_actor(self, actor, **kwargs):
@@ -117,6 +219,13 @@ class Actor:
 
         if "actor_model" in kwargs:
             actor.set("model", kwargs["actor_model"])
+
+        if "junction_id" in kwargs:
+            actor.set("junction_id", str(kwargs["junction_id"]))
+
+        if "start_point_yaw" in kwargs:
+            actor.set("start_point_yaw", str(
+                round(kwargs["start_point_yaw"].transform.rotation.yaw, 2)))
 
         if "actor_color" in kwargs:
             actor.set("color", "{}, {}, {}".format(*get_color_by_name(kwargs["actor_color"])))

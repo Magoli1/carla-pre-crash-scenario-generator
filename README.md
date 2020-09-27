@@ -59,21 +59,45 @@ The Scenario plugin creates the ``scenario`` tag with the attributes ``name`` an
 ```
 
 ##### Actor
-The Actor plugin can be used for any kind of actor like vehicles or walkers. In the default case, the actor plugin is configured to generate *ego_vehicle* tags with vehicles from the blueprint library. When supplying the ``per_scenario`` attribute, you can multiply the aready created scenarios from the former pipeline steps. It is also possible to supply the ``tag`` name that the plugin writes into the xml, eg. if you would like to use ``other_actor`` as a tag. You can also change the type of actor, that is used for the *model* attribute, by changing the ``type``. To position the actors, you can configure the ``positioning`` for *junctions* and/or *streets*. Optionally ``colors`` can be defined, which can be selected for the actor. A list of the available colors can be found below. If ``colors`` is not defined, all of the colors are possible to be selected.
+The Actor plugin can be used for any kind of actor like vehicles or walkers. In the default case, the actor plugin is configured to generate *ego_vehicle* tags with vehicles from the blueprint library. When supplying the ``per_scenario`` attribute, you can multiply the aready created scenarios from the former pipeline steps. It is also possible to supply the ``tag`` name that the plugin writes into the xml, eg. if you would like to use ``other_actor`` as a tag. You can also change the type of actor, that is used for the *model* attribute, by changing the ``type``. To position the actors, you can configure the ``positioning`` for *junctions* and/or *streets*. 
+The ``junctions`` attribute consists of the ``straight``, ``left`` and ``right`` parameters. These can be used to define which directions at an junction should be possible for the actor. With the ``has_traffic_lights`` attribute you can select whether the actor should spawn only at junctions with traffic lights or only at junctions without traffic lights or whether all junctions are possible. 
+For actors with the tag ``other_vehicle`` there is also the ``relative_to_ego`` attribute. With this attribute it can be defined that the actor spawns at the same junction as the "ego_vehicle" in a certain orientation to it. 
+To specify that only four wheelers should be selected as actor models, the attribute ``four_wheelers_only`` can be set to ``True``.
+Optionally ``colors`` can be defined, which can be selected for the actor. A list of the available colors can be found below. If ``colors`` is not defined, all of the colors are possible to be selected.
 ```yaml
 - Actor:
     per_scenario: 5 # optional, default 1
     tag: ego_vehicle # optional, default ego_vehicle
     type: vehicle # optional, default vehicle
     positioning: # optional, default junctions: True, streets: True
-        junctions: False
-        streets: True
+        junctions: # optional
+            straight: False # optional, default: True
+            left: False # optional, default: True
+            right: True # optional, default: True
+            has_traffic_lights: False # optional, <True|False|Only>, default: True
+        streets: False # optional, default: True
+    four_wheelers_only: True # optional, default: True
     colors: # optional, default: all available colors
         - Black
         - White
         - Silver
         - Red
         - Blue
+- Actor:
+    per_scenario: 5 # optional, default 1
+    tag: other_vehicle # optional, default ego_vehicle
+    type: vehicle # optional, default vehicle
+    positioning: # optional, default junctions: True, streets: True
+        junctions: # optional
+            straight: False # optional, default: True
+            left: False # optional, default: True
+            right: True # optional, default: True
+            has_traffic_lights: False # optional, <True|False|Only>, default: True
+            relative_to_ego: # optional
+                  straight: False # optional, default: True
+                  left: True # optional, default: True
+                  right: True # optional, default: True
+            streets: False # optional, default: True
 ```
 
 *Available Colors:*
