@@ -29,7 +29,7 @@ def get_waypoints_for_all_maps(carla_client, distance=5):
             current_map = carla_client.get_world().get_map()
             waypoints = current_map.generate_waypoints(distance)
             waypoints_per_map[map_name] = dict()
-            waypoints_per_map[map_name]["junctions"] = get_junction_waypoints(waypoints)
+            waypoints_per_map[map_name]["junctions"] = get_junction_waypoints(waypoints, map_name)
             waypoints_per_map[map_name]["streets"] = get_street_waypoints(waypoints)
             waypoints_per_map[map_name]["junctions"] = add_traffic_lights_at_junction(carla_client,
                                                                                       current_map,
