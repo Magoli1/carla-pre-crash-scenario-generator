@@ -66,7 +66,7 @@ def get_simple_map_name(full_qualified_name):
     return full_qualified_name.rsplit('/')[-1]
 
 
-def get_junction_waypoints(waypoints):
+def get_junction_waypoints(waypoints, map_name):
     """Filters the waypoints for the ones on a junction
 
     :param waypoints: A list of unfiltered waypoints
@@ -75,13 +75,22 @@ def get_junction_waypoints(waypoints):
     :rtype: dict
     """
     # Internal blacklist only
-    junctions_blacklist = []
+    junctions_blacklist = {
+        "Town01": [],
+        "Town02": [],
+        "Town03": [257, 545, 563],
+        "Town04": [924, 639, 548],
+        "Town05": [],
+        "Town06": [],
+        "Town07": [749, 693, 502],
+        "Town10HD": [134]
+    }
 
     d = defaultdict(lambda: defaultdict(list))
     junction_waypoints = [(waypoint.get_junction().id, waypoint.get_junction(), waypoint)
                           for waypoint in waypoints
                           if waypoint.is_junction and
-                          waypoint.get_junction().id not in junctions_blacklist]
+                          waypoint.get_junction().id not in junctions_blacklist[map_name]]
     for k, obj, v in junction_waypoints:
         d[k]["object"] = obj
         d[k]["waypoints_in_junction"].append(v)
@@ -209,6 +218,8 @@ def add_junction_directions(junctions_per_map):
                 connecting_road_id = start_waypoint.road_id
                 while waypoint_incoming_road.road_id == connecting_road_id:
                     waypoint_incoming_road = waypoint_incoming_road.previous(0.5)[0]
+                # Shift waypoint back into incoming road to have better start-up
+                waypoint_incoming_road = waypoint_incoming_road.previous(5)[0]
 
                 # Determine end-waypoint of the connecting road
                 end_waypoint = start_waypoint
