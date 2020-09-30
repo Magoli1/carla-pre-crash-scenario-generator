@@ -1,6 +1,8 @@
 # Pre Crash Scenario Generator
 
 ## Performance tests can be run using 
+timings.csv holds the timestamp for everyone run of the pipeline as a timestamp, with its descriptions
+ram_usage.csv holds the ram usage by the python process in Kb and its descriptions
 ```
 python generator.py --config 1_config.yaml --loglevel WARN
 ```
