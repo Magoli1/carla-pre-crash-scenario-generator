@@ -1,0 +1,23 @@
+dataprovider: # optional, preload: False
+  preload: True
+pipelines:
+  # 2.2 Scenario FollowLeadingVehicleWithObstacle
+  - Test:
+      steps:
+        - Scenario:
+            name_prefix: FollowLeadingVehicleWithObstacle_generated
+            type: FollowLeadingVehicleWithObstacle
+        - Actor:
+            per_scenario: 5
+            tag: ego_vehicle
+            positioning:
+              junctions: False
+              streets: True
+            four_wheelers_only: True
+        - Actor:
+            per_scenario: 5
+            tag: other_actor
+            four_wheelers_only: False
+        - Weather:
+            generation_type: random_preset
+            per_scenario: 5
