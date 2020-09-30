@@ -1,5 +1,9 @@
 # Pre Crash Scenario Generator
 
+## Performance tests can be run using 
+```
+python generator.py --config 1_config.yaml --loglevel WARN
+```
 ## Table of Contents
 * [Getting Started](#getting-started)
     * [Prerequisites](#prerequisites)
@@ -199,3 +203,4 @@ make html
     + [Get Scenario Runner](https://github.com/carla-simulator/scenario_runner/blob/master/Docs/getting_scenariorunner.md)
     + [Getting Started](https://github.com/carla-simulator/scenario_runner/blob/master/Docs/getting_started.md)
     + [List of example scenarios](https://github.com/carla-simulator/scenario_runner/blob/master/Docs/list_of_scenarios.md)
+
