@@ -53,14 +53,14 @@ def start_pipeline(carla_client, generator_config, data_provider, log_level):
     description = ["Before Dataprovider run", "After Dataprovider run"]
     process = psutil.Process(os.getpid())
     times = [time.time()]
-    ram = [process.memory_info()[0]]
+    ram = [process.memory_info()[0]/1024]
     if generator_config["dataprovider"]["preload"]:
         logger.info("### START preloading data START ###")
         data_provider.preload()
         logger.info("### END preloading data END ###")
     logger.info("### Running pipelines... ###")
     times.append(time.time())
-    ram.append(process.memory_info()[0])
+    ram.append(process.memory_info()[0]/1024)
     for number_pipeline, pipeline in enumerate(pipelines):
         pipeline_name = extract_pipeline_name(pipeline)
         logger.info(f'## START pipeline "{pipeline_name}" START ##')
