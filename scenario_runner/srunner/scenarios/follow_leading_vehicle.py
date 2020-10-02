@@ -240,7 +240,11 @@ class FollowLeadingVehicleWithObstacle(BasicScenario):
             carla.Rotation(second_actor_waypoint.transform.rotation.pitch, yaw_1,
                            second_actor_waypoint.transform.rotation.roll))
 
-        first_actor = CarlaActorPool.request_new_actor('vehicle.nissan.patrol', first_actor_transform)
+        first_actor = CarlaActorPool.request_new_actor(
+            config.other_actors[0].model,
+            first_actor_transform,
+            color=config.other_actors[0].color)
+
         second_actor = CarlaActorPool.request_new_actor('vehicle.diamondback.century',
                                                         second_actor_transform)
 
