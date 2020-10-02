@@ -1,4 +1,4 @@
-# Pre Crash Scenario Generator
+# Carla Pre Crash Scenario Generator
 
 ## Table of Contents
 * [Getting Started](#getting-started)
