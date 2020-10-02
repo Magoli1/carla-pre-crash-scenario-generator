@@ -10,6 +10,7 @@
     * [Data Provider](#data-provider)
     * [Helper Utils](#helper-utils)
 * [Scenarios](#scenarios)
+* [Scenario Runner](#scenario-runner)
 * [Tools](#tools)
     * [Showing Spawnpoints and Waypoints of Intersections](#showing-spawnpoints-and-waypoints-of-intersections)
 * [Generate the code documentation](#generate-the-code-documentation)
