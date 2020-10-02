@@ -10,6 +10,11 @@ Using the ScenarioRunner
 Please take a look at the [Getting started](Docs/getting_started.md)
 documentation. If you run into problems, check the [FAQ](Docs/FAQ.md) please.
 
+Modifications / Enhancements
+----------------------------
+You can find a list of extensions and changed files [here](modifications.md).
+
+
 Further Information
 ------
 

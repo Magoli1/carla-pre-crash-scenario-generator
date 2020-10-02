@@ -20,7 +20,7 @@ To get started, you first need to install the [prerequisites](#prerequisites). A
 
 Start the generator by using the ``generator.py`` file in the project root. You can specifiy several connection properties for the carla simulator directly via the command line.
 ### Prerequisites
-To get started, you need to install the [CARLA simulator](https://carla.org/) as well as the [scenario runner](https://github.com/carla-simulator/scenario_runner). If you go for the windows version, you don't necessarily need to build CARLA on your own, but you can make use of the [prebuilt releases](https://github.com/carla-simulator/carla/releases). The version used for this project is ``0.9.9``, which is the newest development version. 
+To get started, you need to install the [CARLA simulator](https://carla.org/) as well as the [scenario runner](#scenario-runner). If you go for the windows version, you don't necessarily need to build CARLA on your own, but you can make use of the [prebuilt releases](https://github.com/carla-simulator/carla/releases). The version used for this project is ``0.9.9``, which is the newest development version.
 
 ### Configuration Entities
 The following entities are available out of the box to be used in the configuration file.
@@ -178,6 +178,9 @@ A custom logging instance is passed to the constructor of every plugin. It can b
 The [carla challenge](https://carlachallenge.org/) provides [10 of the most occuring pre-crash scenarios](https://carlachallenge.org/challenge/nhtsa/) as illustrations. As the scenario-runner documentation lacks a proper mapping of these scenarios to the example scenarios, a mapping can be found in the [scenarioMapping](scenarioMapping.txt) as a key-value-pairing.
 
 The values provided, are the filenames in which the configurations of these scenarios are in. As an example ``Traffic03:ObjectCrossing``, where ``ObjectCrossing`` is the filename in ``<scenario-runner-root>/srunner/examples`` and ``Traffic03`` is the scenario number coming from the carla challenge. Inside of the configuration file, you will find scenarios of type ``StationaryObjectCrossing`` and of type ``DynamicObjectCrossing``. Both are valid start scenarios to run with eg. ``python scenario_runner.py --scenario DynamicObjectCrossing_1 --reloadWorld --timeout 30`` (mind the ``_1`` after the scenarioname, as there are multiple ones).
+
+## Scenario Runner
+You can find a custom version of the Carla Scenario Runner in the ``scenario_runner`` folder. The custom version extends the scenarios by some additional features, so that e.g. the colors of the cars can be provided via the XML configuration. More about the Scenario Runner can be found in the [Readme](scenario_runner/README.md).
 
 ## Tools 
 We provide several powerful tools, that are helpful in order to develop new features or to visualize interesting entities on the maps.
